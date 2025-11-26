@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Pytest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+    - uses: actions/checkout@v5
+    - uses: actions/cache@v4
+      name: Cache Conda
+      env:
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key:
+          ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
+    - uses: conda-incubator/setup-miniconda@v3
+      with:
+        environment-file: environment.yml
+        activate-environment: partnership-analysis
+        auto-update-conda: true
+        python-version: 3.11
+        auto-activate: false # Prevent activating the base environment
+    - name: Run tests
+      run: |
+        python -m pytest tests/ --no-cov -q --tb=no --disable-warnings
