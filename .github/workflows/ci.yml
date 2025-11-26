@@ -7,6 +7,7 @@ on:
 
 jobs:
   test:
+    name: Pytest
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -17,4 +18,6 @@ jobs:
         auto-update-conda: true
         python-version: 3.11
     - name: Run tests
-      run: python -m pytest tests/ --no-cov -q --tb=no --disable-warnings
+      run: |
+        conda activate partnership-analysis
+        python -m pytest tests/ --no-cov -q --tb=no --disable-warnings
