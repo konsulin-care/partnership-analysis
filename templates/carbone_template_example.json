@@ -1,0 +1,128 @@
+{
+  "data": {
+    "document": {
+      "title": "Partnership Analysis: Nama Kala x GraftLab",
+      "date": "2025-11-26",
+      "author": "Nama Kala",
+      "contact": "home@lamuri.my.id"
+    },
+    
+    "executive_summary": {
+      "headline": "Partnership Model Delivers Superior Financial Outcomes",
+      "key_findings": [
+        "44.2% reduction in initial capital requirements",
+        "9.2 months faster break-even timeline",
+        "IDR 857 million in cumulative savings over three years"
+      ]
+    },
+    
+    "partnership_overview": {
+      "parties": [
+        {
+          "name": "PT Lamuri Prima Karya",
+          "role": "Hub Operator",
+          "location": "BSD City, Jakarta"
+        },
+        {
+          "name": "GraftLab Hair Transplant and Aesthetics",
+          "role": "Tenant",
+          "location": "Jakarta Selatan"
+        }
+      ],
+      "terms": {
+        "revenue_share_pct": 12,
+        "space_sqm": 72,
+        "commitment_years": 2,
+        "launch_timeline_days": 90
+      }
+    },
+    
+    "financial_analysis": {
+      "sections": [
+        {
+          "title": "Scenario Comparison",
+          "tables": [
+            {
+              "header": ["Metric", "Standalone", "Hub", "Advantage"],
+              "rows": [
+                ["Initial Investment", "IDR 1,675,000,000", "IDR 935,000,000", "44.2%"],
+                ["Break-Even Timeline", "16.3 months", "7.1 months", "56.4%"],
+                ["Monthly Operating Cost", "IDR 97,087,500", "IDR 67,891,750", "30.1%"],
+                ["Year 1 Profit", "IDR 1,459,500,000", "IDR 1,627,790,208", "11.5%"]
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Three-Year Projection",
+          "tables": [
+            {
+              "header": ["Year", "Annual Savings"],
+              "rows": [
+                ["Year 1", "IDR 168,290,208"],
+                ["Year 2", "IDR 148,130,208"],
+                ["Year 3", "IDR 126,559,008"],
+                ["Total 3-Year", "IDR 442,979,424"]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    
+    "market_research": {
+      "sections": [
+        {
+          "title": "Market Benchmarks",
+          "content": "Analysis grounded in current market data:",
+          "benchmarks": [
+            {
+              "category": "Hair Transplant Pricing",
+              "value": "IDR 15.8M to IDR 47.4M per procedure",
+              "source": "Medihair Indonesia 2025"
+            },
+            {
+              "category": "Medical Aesthetics Market Growth",
+              "value": "11.5% CAGR 2024-2029",
+              "source": "Globe Newswire 2024"
+            }
+          ]
+        }
+      ]
+    },
+    
+    "recommendations": {
+      "primary": "Proceed with Wellness Hub partnership model",
+      "rationale": "Superior financial outcomes with lower capital exposure and operational complexity",
+      "action_items": [
+        "Execute partnership agreement with 2-year commitment",
+        "Coordinate tenant build-out and medical equipment procurement",
+        "Launch marketing and patient acquisition campaign",
+        "Establish integrated booking and payment systems"
+      ]
+    },
+    
+    "references": [
+      {
+        "id": "[1]",
+        "text": "Medihair Indonesia Market Analysis. 2025. Hair Transplant Pricing and Market Trends."
+      },
+      {
+        "id": "[2]",
+        "text": "Globe Newswire. 2024. Indonesia Medical Aesthetics Market Report."
+      }
+    ]
+  },
+  
+  "template": "partnership_report_v1",
+  "options": {
+    "language": "en",
+    "format": "pdf",
+    "margins": {
+      "top": 20,
+      "bottom": 20,
+      "left": 15,
+      "right": 15
+    }
+  }
+}

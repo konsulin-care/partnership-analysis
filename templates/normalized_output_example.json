@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "document_id": "nama_kala_graftlab_2025_11",
+    "document_hash": "7f4a8e2c9d1b5e6f3a4c8d2e1b5f9a3c",
+    "generated_at": "2025-11-26T20:30:45Z",
+    "schema_version": "1.0",
+    "extraction_confidence": 0.92
+  },
+  
+  "organizations": [
+    {
+      "name": "PT Lamuri Prima Karya Nama Kala",
+      "role": "hub_operator",
+      "industry": "wellness_hub",
+      "location": {
+        "city": "BSD City",
+        "country": "Indonesia",
+        "coordinates": [-6.3041, 106.6482]
+      },
+      "contact": {
+        "email": "home@lamuri.my.id",
+        "phone": "+628971214313"
+      }
+    },
+    {
+      "name": "GraftLab Hair Transplant and Aesthetics",
+      "role": "tenant",
+      "industry": "medical_aesthetics",
+      "location": {
+        "city": "Jakarta Selatan",
+        "country": "Indonesia"
+      },
+      "contact": {
+        "email": null,
+        "phone": null
+      }
+    }
+  ],
+  
+  "partnership_terms": {
+    "revenue_share_pct": 12,
+    "minimum_monthly_fee_idr": 9360000,
+    "capex_investment_idr": 935000000,
+    "capex_hub_contribution_idr": 490000000,
+    "commitment_years": 2,
+    "space_sqm": 72,
+    "launch_timeline_days": 90
+  },
+  
+  "financial_data": {
+    "scenarios": [
+      {
+        "name": "standalone",
+        "monthly_revenue_idr": 200000000,
+        "monthly_costs": {
+          "rent_idr": 20833333,
+          "staff_idr": 30500000,
+          "utilities_idr": 4500000,
+          "medical_supplies_idr": 8000000,
+          "capex_amortization_idr": 34895833
+        },
+        "monthly_profit_idr": 102912500,
+        "annual_profit_idr": 1234950000,
+        "breakeven_months": 16
+      },
+      {
+        "name": "hub",
+        "monthly_revenue_idr": 200000000,
+        "monthly_costs": {
+          "rent_idr": 0,
+          "staff_idr": 4916750,
+          "utilities_idr": 0,
+          "medical_supplies_idr": 8000000,
+          "capex_amortization_idr": 19479166
+        },
+        "monthly_profit_idr": 132108250,
+        "annual_profit_idr": 1585299000,
+        "breakeven_months": 7
+      }
+    ],
+    "year_1_revenue_idr": 2400000000,
+    "year_3_cumulative_savings_idr": 442979424,
+    "npv_discount_rate": 0.10
+  },
+  
+  "research_data": {
+    "market_benchmarks": [
+      {
+        "category": "hair_transplant_pricing",
+        "value": 37850000,
+        "unit": "idr_per_procedure",
+        "source_citation": "Medihair Indonesia 2025",
+        "research_date": "2025-11-20",
+        "confidence": 0.88
+      },
+      {
+        "category": "indonesian_aesthetics_market_cagr",
+        "value": 0.115,
+        "unit": "annual_growth_rate",
+        "source_citation": "Globe Newswire 2024",
+        "research_date": "2025-11-15",
+        "confidence": 0.91
+      }
+    ]
+  },
+  
+  "quality_flags": {
+    "missing_data_fields": [],
+    "low_confidence_entities": ["graftlab_contact_email", "graftlab_website"],
+    "data_inconsistencies": []
+  }
+}
