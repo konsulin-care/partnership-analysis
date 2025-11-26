@@ -14,7 +14,8 @@ jobs:
         shell: bash -el {0}
     steps:
     - uses: actions/checkout@v5
-    - name: Cache Conda
+    - uses: actions/cache@v4
+      name: Cache Conda
       env:
         CACHE_NUMBER: 0
       with:
