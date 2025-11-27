@@ -191,7 +191,7 @@ class TestWebSearchClient:
         assert results[0]['confidence'] == 0.85
 
         mock_models.generate_content.assert_called_once_with(
-            model="gemini-2.0-flash-exp",
+            model="gemini-2.5-flash",
             contents="Search the web for: test query",
             config=mock_config
         )
