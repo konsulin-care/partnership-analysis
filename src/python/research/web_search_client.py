@@ -93,7 +93,7 @@ def _perform_search(client, config: types.GenerateContentConfig, query: str) -> 
     Parses the response to extract search results.
     """
     response = client.models.generate_content(
-        model="gemini-2.0-flash-exp",
+        model="gemini-2.5-flash",
         contents=f"Search the web for: {query}",
         config=config,
     )
