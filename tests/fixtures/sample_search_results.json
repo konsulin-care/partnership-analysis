@@ -1,36 +1,36 @@
 [
   {
     "query": "medical aesthetics clinic pricing Indonesia 2025",
-    "title": "Indonesia Medical Aesthetics Market Report 2025",
-    "url": "https://example.com/report",
+    "title": ["Indonesia Medical Aesthetics Market Report 2025"],
+    "url": ["https://example.com/report"],
     "snippet": "Hair transplant procedures range from IDR 15.8M to 47.4M with average costs around IDR 30M. Market growth rate of 15% annually.",
     "confidence": 0.85
   },
   {
     "query": "medical aesthetics clinic pricing Indonesia 2025",
-    "title": "Cosmetic Surgery Costs in Jakarta 2025",
-    "url": "https://clinic-example.com/pricing",
+    "title": ["Cosmetic Surgery Costs in Jakarta 2025"],
+    "url": ["https://clinic-example.com/pricing"],
     "snippet": "Medical aesthetics services cost between IDR 5M to 25M depending on the procedure. Clinic setup costs approximately IDR 500M.",
     "confidence": 0.75
   },
   {
     "query": "Indonesia wellness market size 2025",
-    "title": "Wellness Industry Analysis Indonesia",
-    "url": "https://marketresearch.com/indonesia-wellness",
+    "title": ["Wellness Industry Analysis Indonesia"],
+    "url": ["https://marketresearch.com/indonesia-wellness"],
     "snippet": "The Indonesian wellness market is valued at IDR 25T with 12% annual growth rate. Medical tourism contributes significantly.",
     "confidence": 0.80
   },
   {
     "query": "clinic operational costs Indonesia",
-    "title": "Healthcare Business Costs in Indonesia",
-    "url": "https://healthcare.gov.id/costs",
+    "title": ["Healthcare Business Costs in Indonesia"],
+    "url": ["https://healthcare.gov.id/costs"],
     "snippet": "Average monthly operational costs for a medical clinic range from IDR 50M to 150M including staff and rent.",
     "confidence": 0.70
   },
   {
     "query": "hair transplant market growth",
-    "title": "Global Hair Restoration Market 2025",
-    "url": "https://research.edu/hair-market",
+    "title": ["Global Hair Restoration Market 2025"],
+    "url": ["https://research.edu/hair-market"],
     "snippet": "The global hair transplant market grew by 25% in 2024 and is expected to continue growing at 18% CAGR.",
     "confidence": 0.90
   }

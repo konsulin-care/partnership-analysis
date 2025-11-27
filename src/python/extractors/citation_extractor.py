@@ -28,10 +28,22 @@ def extract_source_citations(search_results: List[Dict[str, Any]]) -> List[Dict[
     citations = []
 
     for result in search_results:
-        title = result.get('title', '').strip()
-        url = result.get('url', '').strip()
+        title_raw = result.get('title', [])
+        url_raw = result.get('url', [])
         snippet = result.get('snippet', '').strip()
         confidence = result.get('confidence', 0.5)
+
+        # Handle title as list or string
+        if isinstance(title_raw, list):
+            title = ' '.join(title_raw).strip()
+        else:
+            title = str(title_raw).strip()
+
+        # Handle url as list or string
+        if isinstance(url_raw, list):
+            url = url_raw[0].strip() if url_raw else ''
+        else:
+            url = str(url_raw).strip()
 
         if not url or not title:
             continue

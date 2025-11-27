@@ -51,8 +51,8 @@ class TestExtractPricingBenchmarks:
     def test_extract_pricing_benchmarks_no_matches(self):
         """Test with results that have no pricing info."""
         results = [{
-            'title': 'Test Title',
-            'url': 'https://example.com',
+            'title': ['Test Title'],
+            'url': ['https://example.com'],
             'snippet': 'This is just some text with no pricing information.',
             'confidence': 0.5
         }]
