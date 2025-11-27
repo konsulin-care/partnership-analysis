@@ -9,7 +9,7 @@ class TestConfigLoader:
     def test_load_from_env(self):
         # Test loading from environment variables
         with patch.dict(os.environ, {'TEST_KEY': 'test_value'}):
-            loader = ConfigLoader(env_path=None)  # No .env file
+            loader = ConfigLoader(env_path='/nonexistent')  # No .env file
             assert loader.get('TEST_KEY') == 'test_value'
 
     def test_load_from_yaml(self):
@@ -26,9 +26,10 @@ class TestConfigLoader:
 
     def test_default_merging(self):
         # Test that defaults are merged when not in env or yaml
-        loader = ConfigLoader(env_path=None, config_path=None)
-        assert loader.get('research_cache_ttl_days') == 30  # from defaults
-        assert loader.get('output_directory') == 'outputs'
+        with patch('os.environ', {}):
+            loader = ConfigLoader(env_path='/nonexistent', config_path=None)
+            assert loader.get('research_cache_ttl_days') == 30  # from defaults
+            assert loader.get('output_dir') == './outputs'
 
     def test_env_overrides_defaults(self):
         # Test that env overrides defaults
@@ -50,15 +51,18 @@ class TestConfigLoader:
             os.unlink(f.name)
 
     def test_get_method(self):
-        loader = ConfigLoader(env_path=None)
-        assert loader.get('nonexistent', 'default') == 'default'
-        assert loader.get('research_cache_ttl_days') == 30
+        with patch('os.environ', {}):
+            loader = ConfigLoader(env_path='/nonexistent')
+            assert loader.get('nonexistent', 'default') == 'default'
+            assert loader.get('research_cache_ttl_days') == 30
 
     def test_getitem(self):
-        loader = ConfigLoader(env_path=None)
-        assert loader['research_cache_ttl_days'] == 30
+        with patch('os.environ', {}):
+            loader = ConfigLoader(env_path='/nonexistent')
+            assert loader['research_cache_ttl_days'] == 30
 
     def test_contains(self):
-        loader = ConfigLoader(env_path=None)
-        assert 'research_cache_ttl_days' in loader
-        assert 'nonexistent' not in loader
+        with patch('os.environ', {}):
+            loader = ConfigLoader(env_path='/nonexistent')
+            assert 'research_cache_ttl_days' in loader
+            assert 'nonexistent' not in loader

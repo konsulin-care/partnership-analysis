@@ -7,29 +7,29 @@ class TestDefaults:
 
     def test_required_keys_present(self):
         required_keys = [
-            'RESEARCH_CACHE_TTL_DAYS',
-            'CARBONE_API_KEY',
-            'OUTPUT_DIR'
+            'research_cache_ttl_days',
+            'carbone_api_key',
+            'output_dir'
         ]
         for key in required_keys:
             assert key in DEFAULTS
 
     def test_research_cache_ttl_days(self):
-        assert DEFAULTS['RESEARCH_CACHE_TTL_DAYS'] == 30
-        assert isinstance(DEFAULTS['RESEARCH_CACHE_TTL_DAYS'], int)
+        assert DEFAULTS['research_cache_ttl_days'] == 30
+        assert isinstance(DEFAULTS['research_cache_ttl_days'], int)
 
     def test_carbone_api_key(self):
-        assert DEFAULTS['CARBONE_API_KEY'] == ''
-        assert isinstance(DEFAULTS['CARBONE_API_KEY'], str)
+        assert DEFAULTS['carbone_api_key'] == ''
+        assert isinstance(DEFAULTS['carbone_api_key'], str)
 
     def test_output_directory(self):
-        assert DEFAULTS['OUTPUT_DIR'] == './outputs'
-        assert isinstance(DEFAULTS['OUTPUT_DIR'], str)
+        assert DEFAULTS['output_dir'] == './outputs'
+        assert isinstance(DEFAULTS['output_dir'], str)
 
     def test_other_defaults(self):
         # Test some other defaults
-        assert DEFAULTS['FINANCIAL_DISCOUNT_RATE'] == 0.10
-        assert DEFAULTS['FINANCIAL_CAPEX_AMORTIZATION_MONTHS'] == 48
-        assert DEFAULTS['LOG_LEVEL'] == 'INFO'
-        assert DEFAULTS['RESEARCH_MAX_QUERIES_PER_GAP'] == 3
-        assert DEFAULTS['EXTRACTION_CONFIDENCE_THRESHOLD'] == 0.75
+        assert DEFAULTS['financial_discount_rate'] == 0.10
+        assert DEFAULTS['financial_capex_amortization_months'] == 48
+        assert DEFAULTS['log_level'] == 'INFO'
+        assert DEFAULTS['research_max_queries_per_gap'] == 3
+        assert DEFAULTS['extraction_confidence_threshold'] == 0.75
