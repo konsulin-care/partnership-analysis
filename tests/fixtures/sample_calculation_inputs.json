@@ -1,0 +1,11 @@
+{
+  "revenue": 285000000,
+  "capex": 500000000,
+  "monthly_profit": 15000000,
+  "share_pct": 0.12,
+  "minimum": 5000000,
+  "cashflows": [-500000000, 100000000, 120000000, 140000000, 160000000, 180000000],
+  "discount_rate": 0.10,
+  "variance_range": [-0.2, -0.1, 0, 0.1, 0.2],
+  "model_type": "standalone"
+}

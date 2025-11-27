@@ -1,45 +1,104 @@
+"""
+Unit tests for validators.py
+"""
+
+import json
 import pytest
-from src.python.config.validators import validate_config
+import math
+
+from src.python.calculations.financial_models import calculate_npv
+from src.python.calculations.validators import (
+    validate_calculations,
+    validate_inputs,
+)
 
 
-class TestValidateConfig:
-    def test_valid_config(self):
-        # Test with all required keys and valid types
-        config = {
-            'research_cache_ttl_days': 30,
-            'web_search_timeout': 30,
-            'carbone_api_key': 'test_key',
-            'output_directory': 'outputs'
-        }
-        assert validate_config(config) is True
+@pytest.fixture
+def sample_inputs():
+    with open('tests/fixtures/sample_calculation_inputs.json', 'r') as f:
+        return json.load(f)
 
-    def test_missing_required_key(self):
-        # Test missing required key
-        config = {
-            'web_search_timeout': 30,
-            'carbone_api_key': 'test_key',
-            'output_directory': 'outputs'
-            # missing research_cache_ttl_days
-        }
-        with pytest.raises(ValueError, match="Missing required config key: research_cache_ttl_days"):
-            validate_config(config)
 
-    def test_invalid_type(self):
-        # Test invalid type for research_cache_ttl_days
-        config = {
-            'research_cache_ttl_days': 'not_an_int',
-            'web_search_timeout': 30,
-            'carbone_api_key': 'test_key',
-            'output_directory': 'outputs'
-        }
-        with pytest.raises(ValueError, match="research_cache_ttl_days must be an integer"):
-            validate_config(config)
+def test_validate_calculations_valid(sample_inputs):
+    # Calculate correct npv
+    correct_npv = calculate_npv(sample_inputs['cashflows'], sample_inputs['discount_rate'])
 
-    def test_missing_multiple_keys(self):
-        # Test missing multiple keys
-        config = {
-            'research_cache_ttl_days': 30
-            # missing others
-        }
-        with pytest.raises(ValueError, match="Missing required config key: web_search_timeout"):
-            validate_config(config)
+    results = {
+        'profit': 15000000,
+        'revenue': sample_inputs['revenue'],
+        'total_costs': sample_inputs['revenue'] - 15000000,
+        'breakeven_months': 34,  # 500M / 15M ≈ 33.33, ceil to 34
+        'capex': sample_inputs['capex'],
+        'monthly_profit': sample_inputs['monthly_profit'],
+        'npv': correct_npv,
+        'cashflows': sample_inputs['cashflows'],
+        'discount_rate': sample_inputs['discount_rate'],
+        'revenue_share': sample_inputs['revenue'] * sample_inputs['share_pct'],
+        'share_pct': sample_inputs['share_pct'],
+        'profit_margin': 0.05,
+        'roi': 0.2,
+    }
+
+    is_valid, errors = validate_calculations(results)
+    assert is_valid
+    assert len(errors) == 0
+
+
+def test_validate_calculations_invalid_nan():
+    results = {'profit': float('nan')}
+    is_valid, errors = validate_calculations(results)
+    assert not is_valid
+    assert len(errors) > 0
+    assert 'NaN' in errors[0]
+
+
+def test_validate_calculations_invalid_profit_mismatch():
+    results = {
+        'profit': 1000000,
+        'revenue': 2000000,
+        'total_costs': 500000,  # Should be 2000000 - 500000 = 1500000 profit
+    }
+    is_valid, errors = validate_calculations(results)
+    assert not is_valid
+    assert any('Profit calculation mismatch' in error for error in errors)
+
+
+def test_validate_calculations_invalid_breakeven():
+    results = {
+        'breakeven_months': 10,
+        'capex': 1000000,
+        'monthly_profit': 50000,  # Should be ceil(1000000/50000) = 20
+    }
+    is_valid, errors = validate_calculations(results)
+    assert not is_valid
+    assert any('Break-even calculation mismatch' in error for error in errors)
+
+
+def test_validate_calculations_extreme_roi():
+    results = {'roi': -3.0}  # Too negative
+    is_valid, errors = validate_calculations(results)
+    assert not is_valid
+    assert any('ROI seems unreasonably negative' in error for error in errors)
+
+
+def test_validate_inputs_valid(sample_inputs):
+    is_valid, errors = validate_inputs(
+        revenue=sample_inputs['revenue'],
+        capex=sample_inputs['capex'],
+        monthly_profit=sample_inputs['monthly_profit']
+    )
+    assert is_valid
+    assert len(errors) == 0
+
+
+def test_validate_inputs_invalid_negative():
+    is_valid, errors = validate_inputs(revenue=-1000000)
+    assert not is_valid
+    assert len(errors) > 0
+    assert 'Negative value not allowed' in errors[0]
+
+
+def test_validate_inputs_invalid_nan():
+    is_valid, errors = validate_inputs(revenue=float('nan'))
+    assert not is_valid
+    assert len(errors) > 0
