@@ -179,8 +179,8 @@ def filter_valid_results(results: List[Dict[str, Any]], strict: bool = False) ->
         is_valid, errors = validate_extracted_values(result)
         if strict and is_valid:
             valid_results.append(result)
-        elif not strict and (is_valid or len(errors) == 0 or 'validation_errors' not in result):
-            # Include results that are valid or have only minor issues
+        elif not strict:
+            # Non-strict: include all results regardless of validation
             valid_results.append(result)
 
     return valid_results
