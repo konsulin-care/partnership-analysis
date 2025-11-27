@@ -17,6 +17,8 @@ dependencies:
   - python-json-logger>=2.0.0
   - structlog>=23.1.0
   - bibtexparser>=1.4.3
+  - typing
+  - google-genai
   
   - pip:
     - carbone-sdk>=1.0.0
