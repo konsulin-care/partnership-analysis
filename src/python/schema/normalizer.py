@@ -18,11 +18,13 @@ class EntityNormalizer:
     type coercion, and field mapping for partnership analysis entities.
     """
 
+from typing import Dict, Any, List, Union, Optional
+
     def normalize_entity(
         self,
         entity: Dict[str, Any],
         schema: Dict[str, Any],
-        field_mapping: Dict[str, str] = None
+        field_mapping: Optional[Dict[str, str]] = None
     ) -> Dict[str, Any]:
         """
         Normalize an entity dictionary according to the provided JSON schema.
