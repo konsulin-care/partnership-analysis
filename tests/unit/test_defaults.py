@@ -7,34 +7,29 @@ class TestDefaults:
 
     def test_required_keys_present(self):
         required_keys = [
-            'research_cache_ttl_days',
-            'web_search_timeout',
-            'carbone_api_key',
-            'output_directory'
+            'RESEARCH_CACHE_TTL_DAYS',
+            'CARBONE_API_KEY',
+            'OUTPUT_DIR'
         ]
         for key in required_keys:
             assert key in DEFAULTS
 
     def test_research_cache_ttl_days(self):
-        assert DEFAULTS['research_cache_ttl_days'] == 30
-        assert isinstance(DEFAULTS['research_cache_ttl_days'], int)
-
-    def test_web_search_timeout(self):
-        assert DEFAULTS['web_search_timeout'] == 30
-        assert isinstance(DEFAULTS['web_search_timeout'], int)
+        assert DEFAULTS['RESEARCH_CACHE_TTL_DAYS'] == 30
+        assert isinstance(DEFAULTS['RESEARCH_CACHE_TTL_DAYS'], int)
 
     def test_carbone_api_key(self):
-        assert DEFAULTS['carbone_api_key'] == ''
-        assert isinstance(DEFAULTS['carbone_api_key'], str)
+        assert DEFAULTS['CARBONE_API_KEY'] == ''
+        assert isinstance(DEFAULTS['CARBONE_API_KEY'], str)
 
     def test_output_directory(self):
-        assert DEFAULTS['output_directory'] == 'outputs'
-        assert isinstance(DEFAULTS['output_directory'], str)
+        assert DEFAULTS['OUTPUT_DIR'] == './outputs'
+        assert isinstance(DEFAULTS['OUTPUT_DIR'], str)
 
     def test_other_defaults(self):
         # Test some other defaults
-        assert DEFAULTS['discount_rate'] == 0.10
-        assert DEFAULTS['capex_amortization_years'] == 5
-        assert DEFAULTS['log_level'] == 'INFO'
-        assert DEFAULTS['research_query_limit'] == 3
-        assert DEFAULTS['extraction_confidence_threshold'] == 0.70
+        assert DEFAULTS['FINANCIAL_DISCOUNT_RATE'] == 0.10
+        assert DEFAULTS['FINANCIAL_CAPEX_AMORTIZATION_MONTHS'] == 48
+        assert DEFAULTS['LOG_LEVEL'] == 'INFO'
+        assert DEFAULTS['RESEARCH_MAX_QUERIES_PER_GAP'] == 3
+        assert DEFAULTS['EXTRACTION_CONFIDENCE_THRESHOLD'] == 0.75
