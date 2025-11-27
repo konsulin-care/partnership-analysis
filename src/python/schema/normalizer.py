@@ -193,9 +193,13 @@ from typing import Dict, Any, List, Union, Optional
                 # Handle Z suffix
                 if value.endswith('Z'):
                     parsed = datetime.datetime.fromisoformat(value[:-1] + '+00:00')
+                    return parsed.strftime('%Y-%m-%dT%H:%M:%S') + 'Z'
                 else:
                     parsed = datetime.datetime.fromisoformat(value)
-                return parsed.strftime('%Y-%m-%dT%H:%M:%S') + 'Z'
+                    if parsed.tzinfo:
+                        utc_value = parsed.astimezone(datetime.timezone.utc)
+                        return utc_value.strftime('%Y-%m-%dT%H:%M:%S') + 'Z'
+                    return parsed.isoformat()
             except ValueError:
                 # If can't parse, return as-is
                 return value
