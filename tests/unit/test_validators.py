@@ -5,6 +5,8 @@ Unit tests for validators.py
 import json
 import pytest
 import math
+
+from src.python.calculations.financial_models import calculate_npv
 from src.python.calculations.validators import (
     validate_calculations,
     validate_inputs,
@@ -18,6 +20,9 @@ def sample_inputs():
 
 
 def test_validate_calculations_valid(sample_inputs):
+    # Calculate correct npv
+    correct_npv = calculate_npv(sample_inputs['cashflows'], sample_inputs['discount_rate'])
+
     results = {
         'profit': 15000000,
         'revenue': sample_inputs['revenue'],
@@ -25,7 +30,7 @@ def test_validate_calculations_valid(sample_inputs):
         'breakeven_months': 34,  # 500M / 15M ≈ 33.33, ceil to 34
         'capex': sample_inputs['capex'],
         'monthly_profit': sample_inputs['monthly_profit'],
-        'npv': -100000000,  # Example
+        'npv': correct_npv,
         'cashflows': sample_inputs['cashflows'],
         'discount_rate': sample_inputs['discount_rate'],
         'revenue_share': sample_inputs['revenue'] * sample_inputs['share_pct'],

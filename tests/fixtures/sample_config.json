@@ -1,0 +1,13 @@
+{
+  "standalone_rent_monthly": 20833333,
+  "standalone_staff_monthly": 30500000,
+  "standalone_utilities_monthly": 5000000,
+  "marketing_percentage": 0.05,
+  "supplies_percentage": 0.10,
+  "hub_revenue_share_pct": 0.12,
+  "hub_staff_share_monthly": 4916750,
+  "hub_utilities_share_monthly": 833333,
+  "hub_marketing_share_pct": 0.02,
+  "discount_rate": 0.10,
+  "capex_amortization_years": 5
+}
