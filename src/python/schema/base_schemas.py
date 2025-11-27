@@ -51,7 +51,7 @@ ORGANIZATIONS_SCHEMA: Dict[str, Any] = {
 # Partnership terms schema
 PARTNERSHIP_TERMS_SCHEMA: Dict[str, Any] = {
     "type": "object",
-    "required": ["revenue_share_pct", "capex_investment", "commitment_years"],
+    "required": ["revenue_share_pct", "capex_investment_idr", "commitment_years"],
     "properties": {
         "revenue_share_pct": {
             "type": "number",
