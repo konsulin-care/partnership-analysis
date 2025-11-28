@@ -184,7 +184,7 @@ class TestQueryGenerator:
         assert any("competitive positioning Premium luxury wellness brand" in q for q in queries)
 
     def test_generate_brand_research_queries_missing_keys(self):
-        """Test that missing keys in brand_config raise KeyError."""
+        """Test that missing keys in brand_config raise ValueError."""
         mock_llm = Mock(spec=LLMClient)
         generator = QueryGenerator(llm_client=mock_llm)
 
@@ -193,5 +193,5 @@ class TestQueryGenerator:
             # Missing other keys
         }
 
-        with pytest.raises(KeyError):
+        with pytest.raises(ValueError):
             generator.generate_brand_research_queries(incomplete_config)

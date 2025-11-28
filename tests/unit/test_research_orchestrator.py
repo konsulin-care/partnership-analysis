@@ -45,12 +45,44 @@ class TestResearchOrchestrator:
 
         mock_query_generator.assert_called_once()
         mock_cache_manager.assert_called_once()
-        mock_deep_engine.assert_called_once()
-        mock_llm_client.assert_called_once()
         assert orchestrator.query_generator == mock_qg_instance
         assert orchestrator.cache_manager == mock_cm_instance
-        assert orchestrator.deep_research_engine == mock_de_instance
-        assert orchestrator.llm_client == mock_llm_instance
+
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
+    def test_deep_research_engine_lazy_instantiation(self, mock_deep_engine):
+        """Test that DeepResearchEngine is instantiated lazily when accessed."""
+        mock_de_instance = MagicMock()
+        mock_deep_engine.return_value = mock_de_instance
+
+        orchestrator = ResearchOrchestrator()
+
+        # Initially not instantiated
+        mock_deep_engine.assert_not_called()
+
+        # Access the property
+        engine = orchestrator.deep_research_engine
+
+        # Now it should be instantiated
+        mock_deep_engine.assert_called_once()
+        assert engine == mock_de_instance
+
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    def test_llm_client_lazy_instantiation(self, mock_llm_client):
+        """Test that LLMClient is instantiated lazily when accessed."""
+        mock_llm_instance = MagicMock()
+        mock_llm_client.return_value = mock_llm_instance
+
+        orchestrator = ResearchOrchestrator()
+
+        # Initially not instantiated
+        mock_llm_client.assert_not_called()
+
+        # Access the property
+        client = orchestrator.llm_client
+
+        # Now it should be instantiated
+        mock_llm_client.assert_called_once()
+        assert client == mock_llm_instance
 
     @patch('src.python.research.research_orchestrator.synthesize_market_data')
     @patch('src.python.research.research_orchestrator.parse_search_results')

@@ -37,6 +37,7 @@ The project has completed the deep research feature implementation within the re
 - Implemented performance benchmarks comparing deep vs basic research with execution time, cost, cache effectiveness, memory usage, and result quality metrics
 - Added pytest extensive marker configuration in `tests/conftest.py` to skip time-consuming performance benchmarks by default
 - Fixed performance benchmark mocking issues and result quality evaluation logic
+- Fixed unit test issues: updated `test_generate_brand_research_queries_missing_keys` to expect `ValueError` instead of `KeyError`, and modified `test_init_default_dependencies` to account for lazy instantiation of `DeepResearchEngine` and `LLMClient`, adding separate tests for lazy loading behavior
 - All tests passing with 100+ unit tests and 22 integration tests covering the complete research pipeline
 
 # Next Steps
