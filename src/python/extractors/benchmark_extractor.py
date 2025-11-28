@@ -39,7 +39,11 @@ def extract_pricing_benchmarks(search_results: List[Dict[str, Any]]) -> Dict[str
     for result in search_results:
         snippet = result.get('snippet', '').lower()
         confidence = result.get('confidence', 0.5)
-        source = result.get('url', '')
+        url_raw = result.get('url', [])
+        if isinstance(url_raw, list):
+            source = url_raw[0] if url_raw else ''
+        else:
+            source = str(url_raw)
 
         for pattern in pricing_patterns:
             matches = re.findall(pattern, snippet, re.IGNORECASE)
@@ -107,7 +111,11 @@ def extract_market_metrics(search_results: List[Dict[str, Any]]) -> Dict[str, An
     for result in search_results:
         snippet = result.get('snippet', '').lower()
         confidence = result.get('confidence', 0.5)
-        source = result.get('url', '')
+        url_raw = result.get('url', [])
+        if isinstance(url_raw, list):
+            source = url_raw[0] if url_raw else ''
+        else:
+            source = str(url_raw)
 
         # Extract growth rates
         for pattern in growth_patterns:

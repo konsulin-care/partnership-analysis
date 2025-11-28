@@ -5,8 +5,8 @@ channels:
 dependencies:
   - python=3.11
   - pip
-  - pandas>=2.0.0
-  - numpy>=1.24.0
+  - pandas
+  - numpy
   - requests>=2.30.0
   - pyyaml>=6.0
   - python-dotenv>=1.0

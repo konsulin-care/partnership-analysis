@@ -27,7 +27,7 @@ def extract_financial_data(search_results: List[Dict[str, Any]]) -> List[Dict[st
     """
     from .benchmark_extractor import extract_pricing_benchmarks, extract_market_metrics
     from .citation_extractor import extract_source_citations
-    from .validator import validate_extracted_values
+    from .validators import validate_extracted_values
 
     extracted_data = []
 

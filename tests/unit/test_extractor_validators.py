@@ -4,7 +4,7 @@ Unit tests for validator module.
 
 import json
 import pytest
-from src.python.extractors.validator import (
+from src.python.extractors.validators import (
     validate_extracted_values,
     validate_extraction_results,
     filter_valid_results,

@@ -1,0 +1,110 @@
+{
+  "valid_metadata": {
+    "document_id": "test_doc_123",
+    "document_hash": "a1b2c3d4e5f6789012345678901234567890",
+    "generated_at": "2025-11-27T10:00:00Z",
+    "schema_version": "1.0",
+    "extraction_confidence": 0.85
+  },
+  "valid_metadata_minimal": {
+    "document_id": "test_doc_123",
+    "generated_at": "2025-11-27T10:00:00Z",
+    "schema_version": "1.0"
+  },
+  "invalid_metadata_missing_required": {
+    "document_hash": "a1b2c3d4e5f6789012345678901234567890",
+    "generated_at": "2025-11-27T10:00:00Z"
+  },
+  "invalid_metadata_wrong_type": {
+    "document_id": "test_doc_123",
+    "document_hash": "a1b2c3d4e5f6789012345678901234567890",
+    "generated_at": "2025-11-27T10:00:00Z",
+    "schema_version": "1.0",
+    "extraction_confidence": "high"
+  },
+  "valid_organization": {
+    "name": "Test Clinic",
+    "role": "tenant",
+    "industry": "medical_aesthetics",
+    "location": {
+      "city": "Jakarta",
+      "country": "Indonesia",
+      "coordinates": [-6.2088, 106.8456]
+    },
+    "contact": {
+      "email": "info@testclinic.com",
+      "phone": "+62-21-1234567",
+      "website": "https://testclinic.com"
+    }
+  },
+  "invalid_organization_missing_required": {
+    "industry": "medical_aesthetics"
+  },
+  "valid_partnership_terms": {
+    "revenue_share_pct": 12.5,
+    "commitment_years": 3,
+    "minimum_monthly_fee_idr": 50000000,
+    "capex_investment_idr": 200000000,
+    "capex_hub_contribution_idr": 50000000,
+    "space_sqm": 150,
+    "launch_timeline_days": 90
+  },
+  "invalid_partnership_terms_out_of_range": {
+    "revenue_share_pct": 150,
+    "minimum_monthly_fee_idr": -1000,
+    "capex_investment_idr": 200000000,
+    "capex_hub_contribution_idr": 50000000,
+    "commitment_years": 0,
+    "space_sqm": 150,
+    "launch_timeline_days": 90
+  },
+  "valid_financial_scenario": {
+    "name": "standalone",
+    "monthly_revenue_idr": 285000000,
+    "monthly_costs": {
+      "rent_idr": 20833333,
+      "staff_idr": 30500000,
+      "utilities_idr": 5000000,
+      "medical_supplies_idr": 28500000,
+      "capex_amortization_idr": 40000000
+    },
+    "monthly_profit_idr": 175666667,
+    "annual_profit_idr": 2108000004,
+    "breakeven_months": 2
+  },
+  "valid_full_document": {
+    "metadata": {
+      "document_id": "full_test_001",
+      "generated_at": "2025-11-27T10:00:00Z",
+      "schema_version": "1.0"
+    },
+    "organizations": [
+      {
+        "name": "Test Hub",
+        "role": "hub_operator"
+      },
+      {
+        "name": "Test Clinic",
+        "role": "tenant"
+      }
+    ],
+    "partnership_terms": {
+      "revenue_share_pct": 12.0,
+      "capex_investment_idr": 150000000,
+      "commitment_years": 3
+    },
+    "financial_data": {
+      "scenarios": [
+        {
+          "name": "standalone",
+          "monthly_revenue_idr": 250000000,
+          "monthly_costs": {
+            "rent_idr": 20000000,
+            "staff_idr": 30000000
+          },
+          "breakeven_months": 1
+        }
+      ]
+    }
+  }
+}

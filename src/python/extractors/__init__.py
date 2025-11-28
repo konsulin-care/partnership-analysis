@@ -9,7 +9,7 @@ with confidence scores and attribution tracking.
 from .result_extractor import extract_financial_data
 from .benchmark_extractor import extract_pricing_benchmarks, extract_market_metrics
 from .citation_extractor import extract_source_citations
-from .validator import validate_extracted_values
+from .validators import validate_extracted_values
 
 __all__ = [
     'extract_financial_data',

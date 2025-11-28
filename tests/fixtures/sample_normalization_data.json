@@ -1,0 +1,67 @@
+{
+  "raw_metadata": {
+    "doc_id": "test_doc_123",
+    "hash": "a1b2c3d4e5f6789012345678901234567890",
+    "timestamp": "2025-11-27T10:00:00",
+    "version": "1.0",
+    "confidence": 0.85
+  },
+  "raw_organization": {
+    "clinic_name": "Test Clinic Ltd.",
+    "type": "tenant",
+    "sector": "medical_aesthetics",
+    "city": "Jakarta",
+    "country": "Indonesia",
+    "lat": -6.2088,
+    "lng": 106.8456,
+    "email": "INFO@TESTCLINIC.COM",
+    "phone": "+62-21-1234567",
+    "url": "  https://testclinic.com  "
+  },
+  "raw_partnership_terms": {
+    "share_percentage": "12.5",
+    "min_fee": "50,000,000",
+    "capex": 200000000,
+    "hub_capex": "50.000.000",
+    "years": "3",
+    "area": 150.5,
+    "timeline": 90
+  },
+  "raw_financial_scenario": {
+    "scenario_type": "standalone",
+    "revenue": "285,000,000",
+    "costs": {
+      "monthly_rent": 20833333,
+      "staff_cost": "30,500,000",
+      "utility_cost": 5000000,
+      "supplies": 28500000,
+      "amortization": "40 000 000"
+    },
+    "profit": 175666667,
+    "annual_profit": "2,108,000,004",
+    "breakeven": "2"
+  },
+  "raw_with_nulls": {
+    "name": null,
+    "value": "",
+    "count": 0,
+    "active": "false"
+  },
+  "raw_with_invalid_types": {
+    "number_field": "not_a_number",
+    "integer_field": "12.5",
+    "boolean_field": "maybe",
+    "array_field": "not_an_array"
+  },
+  "raw_datetime_formats": {
+    "iso_datetime": "2025-11-27T10:00:00Z",
+    "datetime_no_tz": "2025-11-27T10:00:00",
+    "date_only": "2025-11-27",
+    "invalid_date": "not-a-date"
+  },
+  "field_mapping_example": {
+    "clinic_name": "Mapped Clinic",
+    "monthly_revenue": 300000000,
+    "total_costs": 50000000
+  }
+}

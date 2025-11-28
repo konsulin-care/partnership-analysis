@@ -6,11 +6,15 @@ cache checking, web search execution, result parsing, and synthesis of market da
 """
 
 from typing import Dict, Any, List
+import structlog
+
 from .query_generator import QueryGenerator
 from .cache_manager import CacheManager
 from .web_search_client import execute_web_search
 from .result_parser import parse_search_results, extract_structured_results
 from .synthesizer import synthesize_market_data
+
+logger = structlog.get_logger(__name__)
 
 
 class ResearchOrchestrator:
@@ -56,26 +60,34 @@ class ResearchOrchestrator:
         Returns:
             Dictionary containing synthesized market data with benchmarks, sources, and confidence scores
         """
+        logger.info("Starting research orchestration", partner_type=partner_type, industry=industry, location=location)
+
         # Step 1: Generate research queries
         queries = self.query_generator.generate_research_queries(partner_type, industry, location)
+        logger.info("Generated research queries", queries=queries)
 
         all_findings = []
 
         # Step 2-4: Process each query
         for query in queries:
             query_hash = self.cache_manager.hash_query(query)
+            logger.info("Processing query", query=query, query_hash=query_hash)
             cached = self.cache_manager.get_cached_result(query_hash)
 
             if cached:
                 # Cache hit: use cached results
+                logger.info("Cache hit for query", query=query)
                 parsed_results = cached.get('results', [])
             else:
                 # Cache miss: execute web search
+                logger.info("Cache miss for query, executing search", query=query)
                 search_results = execute_web_search([query], self.cache_manager.cache)
+                logger.info("Executed web search", query=query, results_count=len(search_results))
 
                 # Parse search results
                 parsed = parse_search_results(search_results)
                 parsed_results = parsed.get('parsed_results', [])
+                logger.info("Parsed search results", parsed_results_count=len(parsed_results))
 
                 # Cache the findings
                 findings = {
@@ -84,6 +96,7 @@ class ResearchOrchestrator:
                     'synthesis': ''
                 }
                 self.cache_manager.cache_research_findings(query_hash, findings)
+                logger.info("Cached research findings", query_hash=query_hash)
 
             # Step 4b: Extract structured facts (placeholder extraction)
             # Convert parsed results to findings format for synthesis
@@ -98,9 +111,12 @@ class ResearchOrchestrator:
 
         # Step 5: Synthesize findings into market data
         synthesized_data = synthesize_market_data(all_findings)
+        logger.info("Synthesized market data", synthesized_data_keys=list(synthesized_data.keys()))
 
         # Step 6: Flag low-confidence data for manual review
         if synthesized_data.get('overall', {}).get('average_confidence', 0.0) < 0.7:
             synthesized_data['flags'] = ['low_confidence_data_detected']
+            logger.info("Flagged low-confidence data", flags=synthesized_data['flags'])
 
+        logger.info("Research orchestration completed", overall_confidence=synthesized_data.get('overall', {}).get('average_confidence', 0.0))
         return synthesized_data
