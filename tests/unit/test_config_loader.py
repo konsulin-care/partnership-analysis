@@ -66,3 +66,30 @@ class TestConfigLoader:
             loader = ConfigLoader(env_path='/nonexistent')
             assert 'research_cache_ttl_days' in loader
             assert 'nonexistent' not in loader
+
+    def test_deep_research_parameters_loaded(self):
+        # Test that deep research parameters are loaded from defaults
+        with patch('os.environ', {}):
+            loader = ConfigLoader(env_path='/nonexistent')
+            assert loader.get('deep_research_max_iterations') == 3
+            assert loader.get('deep_research_model_search') == 'gemini-2.0-flash'
+            assert loader.get('deep_research_model_synthesis') == 'gemini-2.5-flash'
+            assert loader.get('deep_research_model_questions') == 'gemini-2.5-flash'
+            assert loader.get('deep_research_iteration_timeout') == 300
+            assert loader.get('deep_research_cache_ttl_days') == 7
+            assert loader.get('deep_research_gap_threshold') == 3
+
+    def test_deep_research_parameters_from_env(self):
+        # Test that deep research parameters can be overridden from env
+        env_vars = {
+            'deep_research_max_iterations': '5',
+            'deep_research_model_search': 'custom-model',
+            'deep_research_cache_ttl_days': '10'
+        }
+        with patch.dict(os.environ, env_vars):
+            loader = ConfigLoader(env_path='/nonexistent')
+            assert loader.get('deep_research_max_iterations') == '5'  # string from env
+            assert loader.get('deep_research_model_search') == 'custom-model'
+            assert loader.get('deep_research_cache_ttl_days') == '10'
+            # Others should still be defaults
+            assert loader.get('deep_research_model_synthesis') == 'gemini-2.5-flash'

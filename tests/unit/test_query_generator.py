@@ -1,5 +1,7 @@
 import pytest
+from unittest.mock import Mock
 from src.python.research.query_generator import QueryGenerator
+from src.python.research.llm_client import LLMClient
 
 
 class TestQueryGenerator:
@@ -146,3 +148,50 @@ class TestQueryGenerator:
         )
 
         assert len(queries) == len(set(queries))  # No duplicates
+
+    def test_generate_brand_research_queries_normal_case(self):
+        """Test brand research query generation with typical inputs."""
+        # Mock LLM client
+        mock_llm = Mock(spec=LLMClient)
+        mock_llm.execute_prompt.return_value = "Premium luxury wellness brand targeting affluent urban professionals"
+
+        generator = QueryGenerator(llm_client=mock_llm)
+
+        brand_config = {
+            'BRAND_NAME': 'Luxury Wellness Spa',
+            'BRAND_ABOUT': 'A premium spa offering high-end wellness treatments',
+            'BRAND_ADDRESS': 'Jakarta',
+            'BRAND_INDUSTRY': 'wellness',
+            'HUB_LOCATION': 'Singapore'
+        }
+
+        queries = generator.generate_brand_research_queries(brand_config)
+
+        assert isinstance(queries, list)
+        assert len(queries) == 9  # 3 grounds * 3 queries each
+
+        # Check that LLM was called for positioning
+        mock_llm.execute_prompt.assert_called_once()
+        call_args = mock_llm.execute_prompt.call_args
+        assert 'gemini-2.5-flash' in call_args[0]
+        assert 'Summarize the brand positioning' in call_args[0][1]
+
+        # Check query content
+        assert any("Luxury Wellness Spa performance wellness 2025" in q for q in queries)
+        assert any("Luxury Wellness Spa market share wellness" in q for q in queries)
+        assert any("wellness performance Jakarta 2025" in q for q in queries)
+        assert any("wellness market growth Singapore" in q for q in queries)
+        assert any("competitive positioning Premium luxury wellness brand" in q for q in queries)
+
+    def test_generate_brand_research_queries_missing_keys(self):
+        """Test that missing keys in brand_config raise KeyError."""
+        mock_llm = Mock(spec=LLMClient)
+        generator = QueryGenerator(llm_client=mock_llm)
+
+        incomplete_config = {
+            'BRAND_NAME': 'Test Brand',
+            # Missing other keys
+        }
+
+        with pytest.raises(KeyError):
+            generator.generate_brand_research_queries(incomplete_config)

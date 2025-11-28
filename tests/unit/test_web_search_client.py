@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timezone
+import tenacity
 from src.python.research.web_search_client import execute_web_search, _is_cache_valid, _perform_search
 
 
@@ -41,7 +42,7 @@ class TestWebSearchClient:
         mock_datetime.fromisoformat.return_value = datetime(2025, 11, 26, 20, 0, 0, tzinfo=timezone.utc)
 
         queries = ["test query"]
-        results = execute_web_search(queries, cache)
+        results = execute_web_search(queries, cache, research_context=True)
 
         assert len(results) == 1
         assert results[0]["query"] == "test query"
@@ -85,7 +86,7 @@ class TestWebSearchClient:
         }
 
         queries = ["new query"]
-        results = execute_web_search(queries, cache)
+        results = execute_web_search(queries, cache, research_context=True)
 
         assert len(results) == 1
         assert results[0]["query"] == "new query"
@@ -114,7 +115,7 @@ class TestWebSearchClient:
         queries = ["test"]
 
         with pytest.raises(ValueError, match="Google GenAI API key not configured"):
-            execute_web_search(queries, cache)
+            execute_web_search(queries, cache, research_context=True)
 
     @patch('src.python.research.web_search_client.datetime')
     def test_is_cache_valid_valid(self, mock_datetime):
@@ -195,7 +196,7 @@ class TestWebSearchClient:
         # Mock config
         mock_config = MagicMock()
 
-        result = _perform_search(mock_client, mock_config, "test query")
+        result = _perform_search(mock_client, mock_config, "test query", research_context=True)
 
         assert 'text' in result
         assert 'search_results' in result
@@ -207,7 +208,7 @@ class TestWebSearchClient:
         assert result['search_results'][0]['confidence'] == 0.85
 
         mock_models.generate_content.assert_called_once_with(
-            model="gemini-2.5-flash",
+            model="gemini-2.0-flash",
             contents="Search the web for: test query",
             config=mock_config
         )
@@ -223,7 +224,7 @@ class TestWebSearchClient:
         mock_response.text = 'No results text'
         mock_models.generate_content.return_value = mock_response
 
-        result = _perform_search(mock_client, MagicMock(), "test query")
+        result = _perform_search(mock_client, MagicMock(), "test query", research_context=True)
 
         assert result['search_results'] == []
         assert result['text'] == 'No results text'
@@ -249,7 +250,7 @@ class TestWebSearchClient:
         mock_response.text = 'No supports text'
         mock_models.generate_content.return_value = mock_response
 
-        result = _perform_search(mock_client, MagicMock(), "test query")
+        result = _perform_search(mock_client, MagicMock(), "test query", research_context=True)
 
         assert len(result['search_results']) == 0
         assert result['text'] == 'No supports text'
@@ -270,7 +271,7 @@ class TestWebSearchClient:
         mock_response.text = 'Empty chunks text'
         mock_models.generate_content.return_value = mock_response
 
-        result = _perform_search(mock_client, MagicMock(), "test query")
+        result = _perform_search(mock_client, MagicMock(), "test query", research_context=True)
 
         assert result['search_results'] == []
         assert result['text'] == 'Empty chunks text'
@@ -295,7 +296,7 @@ class TestWebSearchClient:
 
         mock_models.generate_content.side_effect = [Exception("API Error"), mock_response]
 
-        result = _perform_search(mock_client, MagicMock(), "test query")
+        result = _perform_search(mock_client, MagicMock(), "test query", research_context=True)
 
         assert result['search_results'] == []
         assert result['text'] == 'Retry success text'
@@ -310,7 +311,29 @@ class TestWebSearchClient:
         mock_models.generate_content.side_effect = Exception("Persistent API Error")
 
         with pytest.raises(Exception):
-            _perform_search(mock_client, MagicMock(), "test query")
+            _perform_search(mock_client, MagicMock(), "test query", research_context=True)
 
         # Should have tried 3 times (initial + 2 retries)
         assert mock_models.generate_content.call_count == 3
+
+    @patch('src.python.research.web_search_client.ConfigLoader')
+    def test_execute_web_search_non_research_context(self, mock_config_loader):
+        """Test execute_web_search with research_context=False raises error."""
+        mock_config = MagicMock()
+        mock_config.get.return_value = "test_api_key"
+        mock_config_loader.return_value = mock_config
+
+        cache = {}
+        queries = ["test"]
+
+        with pytest.raises(ValueError, match="google_search tool can only be used in research contexts"):
+            execute_web_search(queries, cache, research_context=False)
+
+    @patch('src.python.research.web_search_client.genai')
+    def test_perform_search_non_research_context(self, mock_genai):
+        """Test _perform_search with research_context=False raises error."""
+        mock_client = MagicMock()
+        mock_config = MagicMock()
+
+        with pytest.raises(tenacity.RetryError):
+            _perform_search(mock_client, mock_config, "test query", research_context=False)

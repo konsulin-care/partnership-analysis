@@ -3,7 +3,10 @@ import json
 import os
 from unittest.mock import mock_open, patch, MagicMock
 from datetime import datetime, timezone
-from src.python.research.cache_manager import CacheManager, hash_query, get_cached_result, cache_research_findings
+from src.python.research.cache_manager import (
+    CacheManager, hash_query, get_cached_result, cache_research_findings,
+    cache_deep_research_result, get_deep_research_result, get_deep_research_iterations
+)
 
 
 class TestCacheManager:
@@ -65,6 +68,7 @@ class TestCacheManager:
         assert "last_updated" in cache
         assert "research_queries" in cache
         assert "extracted_benchmarks" in cache
+        assert "deep_research" in cache
         mock_print.assert_called_once()
 
     @patch('src.python.research.cache_manager.ConfigLoader')
@@ -94,6 +98,7 @@ class TestCacheManager:
         assert cache["cache_version"] == "1.0"
         assert "research_queries" in cache
         assert "extracted_benchmarks" in cache
+        assert "deep_research" in cache
 
     def test_get_default_cache_structure(self):
         """Test default cache structure creation."""
@@ -105,6 +110,7 @@ class TestCacheManager:
         assert isinstance(default["last_updated"], str)
         assert default["research_queries"] == {}
         assert default["extracted_benchmarks"] == {}
+        assert default["deep_research"] == {}
 
     @patch('src.python.research.cache_manager.ConfigLoader')
     @patch('os.makedirs')
@@ -271,6 +277,174 @@ class TestCacheManager:
         assert cached_item["synthesis"] == "test synthesis"
         mock_save.assert_called_once()
 
+    @patch('src.python.research.cache_manager.CacheManager._save_cache')
+    @patch('src.python.research.cache_manager.ConfigLoader')
+    def test_cache_deep_research_result(self, mock_config_loader, mock_save):
+        """Test caching deep research results."""
+        mock_config_loader.return_value = MagicMock()
+        manager = CacheManager()
+
+        results = {"findings": "test"}
+        metadata = {"iteration": 1, "llm_calls": 2, "timestamp": "2025-11-26T23:50:00Z"}
+
+        with patch('src.python.research.cache_manager.datetime') as mock_datetime:
+            mock_datetime.now.return_value = datetime(2025, 11, 26, 23, 50, 0, tzinfo=timezone.utc)
+
+            manager.cache_deep_research_result("brand_hash123", 1, results, metadata, 30)
+
+        assert "deep_research" in manager.cache
+        assert "brand_hash123" in manager.cache["deep_research"]
+        assert "1" in manager.cache["deep_research"]["brand_hash123"]
+        cached_item = manager.cache["deep_research"]["brand_hash123"]["1"]
+        assert cached_item["results"] == results
+        assert cached_item["metadata"] == metadata
+        assert cached_item["cached_at"] == "2025-11-26T23:50:00+00:00"
+        assert cached_item["ttl_days"] == 30
+        mock_save.assert_called_once()
+
+    @patch('src.python.research.cache_manager.ConfigLoader')
+    def test_get_deep_research_result_found_valid(self, mock_config_loader):
+        """Test getting deep research result when found and valid."""
+        mock_config_loader.return_value = MagicMock()
+        manager = CacheManager()
+
+        manager.cache = {
+            "deep_research": {
+                "brand_hash123": {
+                    "1": {
+                        "results": {"data": "test"},
+                        "metadata": {"iteration": 1},
+                        "cached_at": "2025-11-26T20:00:00Z",
+                        "ttl_days": 30
+                    }
+                }
+            }
+        }
+
+        with patch('src.python.research.cache_manager.datetime') as mock_datetime:
+            mock_datetime.now.return_value = datetime(2025, 11, 26, 21, 0, 0, tzinfo=timezone.utc)
+            mock_datetime.fromisoformat.return_value = datetime(2025, 11, 26, 20, 0, 0, tzinfo=timezone.utc)
+
+            result = manager.get_deep_research_result("brand_hash123", 1)
+
+        assert result == manager.cache["deep_research"]["brand_hash123"]["1"]
+
+    @patch('src.python.research.cache_manager.ConfigLoader')
+    def test_get_deep_research_result_latest_iteration(self, mock_config_loader):
+        """Test getting latest deep research result."""
+        mock_config_loader.return_value = MagicMock()
+        manager = CacheManager()
+
+        manager.cache = {
+            "deep_research": {
+                "brand_hash123": {
+                    "1": {
+                        "results": {"data": "iteration1"},
+                        "metadata": {"iteration": 1},
+                        "cached_at": "2025-11-26T20:00:00Z",
+                        "ttl_days": 30
+                    },
+                    "2": {
+                        "results": {"data": "iteration2"},
+                        "metadata": {"iteration": 2},
+                        "cached_at": "2025-11-26T21:00:00Z",
+                        "ttl_days": 30
+                    }
+                }
+            }
+        }
+
+        with patch('src.python.research.cache_manager.datetime') as mock_datetime:
+            mock_datetime.now.return_value = datetime(2025, 11, 26, 22, 0, 0, tzinfo=timezone.utc)
+            mock_datetime.fromisoformat.return_value = datetime(2025, 11, 26, 21, 0, 0, tzinfo=timezone.utc)
+
+            result = manager.get_deep_research_result("brand_hash123")
+
+        assert result == manager.cache["deep_research"]["brand_hash123"]["2"]
+
+    @patch('src.python.research.cache_manager.ConfigLoader')
+    def test_get_deep_research_result_not_found(self, mock_config_loader):
+        """Test getting deep research result when not found."""
+        mock_config_loader.return_value = MagicMock()
+        manager = CacheManager()
+        manager.cache = {"deep_research": {}}
+
+        result = manager.get_deep_research_result("nonexistent")
+        assert result is None
+
+    @patch('src.python.research.cache_manager.ConfigLoader')
+    def test_get_deep_research_result_iteration_not_found(self, mock_config_loader):
+        """Test getting deep research result when iteration not found."""
+        mock_config_loader.return_value = MagicMock()
+        manager = CacheManager()
+
+        manager.cache = {
+            "deep_research": {
+                "brand_hash123": {
+                    "1": {"results": {"data": "test"}, "cached_at": "2025-11-26T20:00:00Z", "ttl_days": 30}
+                }
+            }
+        }
+
+        result = manager.get_deep_research_result("brand_hash123", 2)
+        assert result is None
+
+    @patch('src.python.research.cache_manager.ConfigLoader')
+    def test_get_deep_research_result_expired(self, mock_config_loader):
+        """Test getting deep research result when expired."""
+        mock_config_loader.return_value = MagicMock()
+        manager = CacheManager()
+
+        manager.cache = {
+            "deep_research": {
+                "brand_hash123": {
+                    "1": {
+                        "results": {"data": "test"},
+                        "cached_at": "2025-11-20T20:00:00Z",
+                        "ttl_days": 5
+                    }
+                }
+            }
+        }
+
+        with patch('src.python.research.cache_manager.datetime') as mock_datetime:
+            mock_datetime.now.return_value = datetime(2025, 11, 26, 21, 0, 0, tzinfo=timezone.utc)
+            mock_datetime.fromisoformat.return_value = datetime(2025, 11, 20, 20, 0, 0, tzinfo=timezone.utc)
+
+            result = manager.get_deep_research_result("brand_hash123", 1)
+
+        assert result is not None
+        assert result["stale"] is True
+
+    @patch('src.python.research.cache_manager.ConfigLoader')
+    def test_get_deep_research_iterations(self, mock_config_loader):
+        """Test getting deep research iterations."""
+        mock_config_loader.return_value = MagicMock()
+        manager = CacheManager()
+
+        manager.cache = {
+            "deep_research": {
+                "brand_hash123": {
+                    "1": {"results": {}},
+                    "3": {"results": {}},
+                    "2": {"results": {}}
+                }
+            }
+        }
+
+        iterations = manager.get_deep_research_iterations("brand_hash123")
+        assert iterations == [1, 2, 3]
+
+    @patch('src.python.research.cache_manager.ConfigLoader')
+    def test_get_deep_research_iterations_empty(self, mock_config_loader):
+        """Test getting deep research iterations when none exist."""
+        mock_config_loader.return_value = MagicMock()
+        manager = CacheManager()
+        manager.cache = {"deep_research": {}}
+
+        iterations = manager.get_deep_research_iterations("nonexistent")
+        assert iterations == []
+
     @patch('src.python.research.cache_manager.CacheManager')
     def test_hash_query_convenience_function(self, mock_cache_manager_class):
         """Test hash_query convenience function."""
@@ -308,3 +482,42 @@ class TestCacheManager:
 
         mock_cache_manager_class.assert_called_once()
         mock_manager.cache_research_findings.assert_called_with("hash123", findings, 30)
+
+    @patch('src.python.research.cache_manager.CacheManager')
+    def test_cache_deep_research_result_convenience_function(self, mock_cache_manager_class):
+        """Test cache_deep_research_result convenience function."""
+        mock_manager = MagicMock()
+        mock_cache_manager_class.return_value = mock_manager
+
+        results = {"findings": "test"}
+        metadata = {"iteration": 1}
+        cache_deep_research_result("brand_hash123", 1, results, metadata, 30)
+
+        mock_cache_manager_class.assert_called_once()
+        mock_manager.cache_deep_research_result.assert_called_with("brand_hash123", 1, results, metadata, 30)
+
+    @patch('src.python.research.cache_manager.CacheManager')
+    def test_get_deep_research_result_convenience_function(self, mock_cache_manager_class):
+        """Test get_deep_research_result convenience function."""
+        mock_manager = MagicMock()
+        mock_cache_manager_class.return_value = mock_manager
+        mock_manager.get_deep_research_result.return_value = {"results": "data"}
+
+        result = get_deep_research_result("brand_hash123", 1)
+
+        mock_cache_manager_class.assert_called_once()
+        mock_manager.get_deep_research_result.assert_called_with("brand_hash123", 1)
+        assert result == {"results": "data"}
+
+    @patch('src.python.research.cache_manager.CacheManager')
+    def test_get_deep_research_iterations_convenience_function(self, mock_cache_manager_class):
+        """Test get_deep_research_iterations convenience function."""
+        mock_manager = MagicMock()
+        mock_cache_manager_class.return_value = mock_manager
+        mock_manager.get_deep_research_iterations.return_value = [1, 2, 3]
+
+        result = get_deep_research_iterations("brand_hash123")
+
+        mock_cache_manager_class.assert_called_once()
+        mock_manager.get_deep_research_iterations.assert_called_with("brand_hash123")
+        assert result == [1, 2, 3]

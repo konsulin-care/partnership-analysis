@@ -33,3 +33,20 @@ class TestDefaults:
         assert DEFAULTS['log_level'] == 'INFO'
         assert DEFAULTS['research_max_queries_per_gap'] == 3
         assert DEFAULTS['extraction_confidence_threshold'] == 0.75
+
+    def test_deep_research_defaults(self):
+        # Test deep research default values
+        assert DEFAULTS['deep_research_max_iterations'] == 3
+        assert isinstance(DEFAULTS['deep_research_max_iterations'], int)
+        assert DEFAULTS['deep_research_model_search'] == 'gemini-2.0-flash'
+        assert isinstance(DEFAULTS['deep_research_model_search'], str)
+        assert DEFAULTS['deep_research_model_synthesis'] == 'gemini-2.5-flash'
+        assert isinstance(DEFAULTS['deep_research_model_synthesis'], str)
+        assert DEFAULTS['deep_research_model_questions'] == 'gemini-2.5-flash'
+        assert isinstance(DEFAULTS['deep_research_model_questions'], str)
+        assert DEFAULTS['deep_research_iteration_timeout'] == 300
+        assert isinstance(DEFAULTS['deep_research_iteration_timeout'], int)
+        assert DEFAULTS['deep_research_cache_ttl_days'] == 7
+        assert isinstance(DEFAULTS['deep_research_cache_ttl_days'], int)
+        assert DEFAULTS['deep_research_gap_threshold'] == 3
+        assert isinstance(DEFAULTS['deep_research_gap_threshold'], int)
