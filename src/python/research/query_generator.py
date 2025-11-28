@@ -91,6 +91,11 @@ class QueryGenerator:
         if self.llm_client is None:
             self.llm_client = LLMClient()
 
+        required_keys = ['BRAND_NAME', 'BRAND_ABOUT', 'BRAND_ADDRESS', 'BRAND_INDUSTRY', 'HUB_LOCATION']
+        missing_keys = [k for k in required_keys if k not in brand_config]
+        if missing_keys:
+            raise ValueError(f"Missing required brand_config keys: {missing_keys}")
+
         brand_name = brand_config['BRAND_NAME']
         brand_about = brand_config['BRAND_ABOUT']
         brand_address = brand_config['BRAND_ADDRESS']
