@@ -3,9 +3,10 @@ Research Orchestrator module for coordinating web research and data extraction.
 
 This module provides the ResearchOrchestrator class that coordinates query generation,
 cache checking, web search execution, result parsing, and synthesis of market data.
+Supports both basic and deep research modes for flexible analysis.
 """
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import structlog
 
 from .query_generator import QueryGenerator
@@ -13,6 +14,8 @@ from .cache_manager import CacheManager
 from .web_search_client import execute_web_search
 from .result_parser import parse_search_results, extract_structured_results
 from .synthesizer import synthesize_market_data
+from .deep_research_engine import DeepResearchEngine
+from .llm_client import LLMClient
 
 logger = structlog.get_logger(__name__)
 
@@ -25,22 +28,43 @@ class ResearchOrchestrator:
     result parsing, and synthesis of market data from web research.
     """
 
-    def __init__(self, query_generator: QueryGenerator = None, cache_manager: CacheManager = None):
+    def __init__(
+        self,
+        query_generator: QueryGenerator = None,
+        cache_manager: CacheManager = None,
+        deep_research_engine: DeepResearchEngine = None,
+        llm_client: LLMClient = None
+    ):
         """
         Initialize the ResearchOrchestrator.
 
         Args:
             query_generator: Instance of QueryGenerator for creating search queries
             cache_manager: Instance of CacheManager for caching research results
+            deep_research_engine: Instance of DeepResearchEngine for deep research mode
+            llm_client: Instance of LLMClient for LLM operations in deep research
         """
         self.query_generator = query_generator or QueryGenerator()
         self.cache_manager = cache_manager or CacheManager()
+        self.deep_research_engine = deep_research_engine or DeepResearchEngine()
+        self.llm_client = llm_client or LLMClient()
 
-    def orchestrate_research(self, partner_type: str, industry: str, location: str) -> Dict[str, Any]:
+    def orchestrate_research(
+        self,
+        partner_type: str,
+        industry: str,
+        location: str,
+        research_mode: str = "basic",
+        brand_config: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         Orchestrate the complete research process following the architecture logic.
 
-        For each research category needed:
+        Supports two research modes:
+        - "basic": Standard research with query generation, caching, and synthesis
+        - "deep": Iterative LLM-driven research with multiple iterations and gap analysis
+
+        For basic mode, follows the standard logic:
         1. Generate 2-3 targeted search queries based on user context
         2. Check cache for identical or similar queries
         3. If cache hit: return cached result (verify freshness)
@@ -52,15 +76,39 @@ class ResearchOrchestrator:
         5. Synthesize findings into coherent market narrative
         6. Flag low-confidence data for manual review
 
+        For deep mode, delegates to DeepResearchEngine for iterative research.
+
         Args:
             partner_type: Type of partner (e.g., 'clinic', 'spa', 'wellness center')
             industry: Industry sector (e.g., 'medical aesthetics', 'wellness')
             location: Geographic location (e.g., 'Indonesia', 'Jakarta')
+            research_mode: Research mode ("basic" or "deep"), defaults to "basic"
+            brand_config: Brand configuration dictionary required for deep research mode
 
         Returns:
             Dictionary containing synthesized market data with benchmarks, sources, and confidence scores
+
+        Raises:
+            ValueError: If research_mode is "deep" but brand_config is not provided
         """
-        logger.info("Starting research orchestration", partner_type=partner_type, industry=industry, location=location)
+        logger.info("Starting research orchestration", partner_type=partner_type, industry=industry, location=location, research_mode=research_mode)
+
+        # Handle deep research mode
+        if research_mode == "deep":
+            if brand_config is None:
+                error_msg = "brand_config is required for deep research mode"
+                logger.error(error_msg)
+                raise ValueError(error_msg)
+            logger.info("Switching to deep research mode")
+            return self.deep_research_engine.conduct_deep_research(brand_config)
+
+        # Handle basic research mode
+        if research_mode != "basic":
+            error_msg = f"Unsupported research mode: {research_mode}. Supported modes: 'basic', 'deep'"
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+
+        logger.info("Using basic research mode")
 
         # Step 1: Generate research queries
         queries = self.query_generator.generate_research_queries(partner_type, industry, location)
@@ -81,7 +129,7 @@ class ResearchOrchestrator:
             else:
                 # Cache miss: execute web search
                 logger.info("Cache miss for query, executing search", query=query)
-                search_results = execute_web_search([query], self.cache_manager.cache)
+                search_results = execute_web_search([query], self.cache_manager.cache, research_context=True)
                 logger.info("Executed web search", query=query, results_count=len(search_results))
 
                 # Parse search results
