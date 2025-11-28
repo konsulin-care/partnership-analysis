@@ -121,7 +121,7 @@ class TestBaseSchemas:
 
         required_fields = PARTNERSHIP_TERMS_SCHEMA["required"]
         assert "revenue_share_pct" in required_fields
-        assert "capex_investment" in required_fields
+        assert "capex_investment_idr" in required_fields
         assert "commitment_years" in required_fields
 
         properties = PARTNERSHIP_TERMS_SCHEMA["properties"]

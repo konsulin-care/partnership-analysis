@@ -286,7 +286,7 @@ class TestEntityNormalizer:
         # Test with datetime object
         dt = datetime.datetime(2025, 11, 27, 10, 30, 45)
         result = normalizer._format_datetime(dt)
-        assert result == "2025-11-27T10:30:45"
+        assert result == "2025-11-27T10:30:45Z"
 
         # Test with timezone-aware datetime
         dt_tz = datetime.datetime(2025, 11, 27, 10, 30, 45, tzinfo=datetime.timezone.utc)

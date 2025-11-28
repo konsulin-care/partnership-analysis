@@ -42,7 +42,6 @@
   },
   "valid_partnership_terms": {
     "revenue_share_pct": 12.5,
-    "capex_investment": 200000000,
     "commitment_years": 3,
     "minimum_monthly_fee_idr": 50000000,
     "capex_investment_idr": 200000000,
@@ -91,7 +90,7 @@
     ],
     "partnership_terms": {
       "revenue_share_pct": 12.0,
-      "capex_investment": 150000000,
+      "capex_investment_idr": 150000000,
       "commitment_years": 3
     },
     "financial_data": {

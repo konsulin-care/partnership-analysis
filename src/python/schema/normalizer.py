@@ -7,7 +7,7 @@ currency normalization, date formatting, and field mapping.
 """
 
 import datetime
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Union, Optional
 
 
 class EntityNormalizer:
@@ -17,8 +17,6 @@ class EntityNormalizer:
     Handles currency normalization (to IDR), date formatting (ISO standards),
     type coercion, and field mapping for partnership analysis entities.
     """
-
-from typing import Dict, Any, List, Union, Optional
 
     def normalize_entity(
         self,
@@ -186,7 +184,8 @@ from typing import Dict, Any, List, Union, Optional
                 utc_value = value.astimezone(datetime.timezone.utc)
                 return utc_value.strftime('%Y-%m-%dT%H:%M:%S') + 'Z'
             else:
-                return value.isoformat()
+                # Assume naive datetime is UTC and add Z
+                return value.isoformat() + 'Z'
         elif isinstance(value, str):
             # Try to parse common formats and reformat
             try:
@@ -199,7 +198,9 @@ from typing import Dict, Any, List, Union, Optional
                     if parsed.tzinfo:
                         utc_value = parsed.astimezone(datetime.timezone.utc)
                         return utc_value.strftime('%Y-%m-%dT%H:%M:%S') + 'Z'
-                    return parsed.isoformat()
+                    else:
+                        # Assume naive datetime is UTC and add Z
+                        return parsed.isoformat() + 'Z'
             except ValueError:
                 # If can't parse, return as-is
                 return value
