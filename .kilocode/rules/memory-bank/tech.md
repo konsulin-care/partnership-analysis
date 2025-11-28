@@ -5,6 +5,7 @@
 - Carbone SDK (Python) for JSON to PDF rendering using Google Docs templates
 - JSON Schema for structured context validation and normalization
 - BibTeX for reference and citation management in generated reports
+- Google Gemini AI (Gemini-2.0-Flash for research, Gemini-2.5-Flash for synthesis)
 
 # Development Setup
 
@@ -12,6 +13,8 @@
 - Environment defined via `environment.yml` and `.env` files, loaded by a dedicated `ConfigLoader` module
 - Local JSON files used for research caching, configuration defaults, and schema definitions
 - Tests organized into `tests/unit` and `tests/integration` with fixtures under `tests/fixtures`
+- Extensive tests marked with `@pytest.mark.extensive` and skipped by default (run with `-m extensive`)
+- Custom pytest configuration in `tests/conftest.py` for marker registration and skipping logic
 
 # Technical Constraints
 
@@ -30,6 +33,8 @@
 # Tool Usage Patterns
 
 - Research orchestrator generates queries, checks cache, then calls web search when needed; extracted benchmarks feed financial calculators
+- Deep research engine performs iterative LLM-driven research with up to 3 iterations, using Gemini models for query refinement, synthesis, and question generation
 - Output formatter converts normalized data and metrics into CSV, JSON, BibTeX, and Carbone JSON payloads for rendering
 - Carbone renderer wrapper initializes the SDK client, sends JSON payloads, and writes PDF binaries to the `outputs` directory
 - Error handler applies exponential backoff retries for web search and Carbone calls, with graceful degradation and default fallbacks on failure
+- Performance benchmarks use extensive testing markers to skip time-consuming tests by default

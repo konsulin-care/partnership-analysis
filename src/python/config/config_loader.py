@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import yaml
 from .defaults import DEFAULTS
+from .validators import validate_config
 
 class ConfigLoader:
     def __init__(self, env_path='.env', config_path=None):
@@ -15,6 +16,8 @@ class ConfigLoader:
                 if yaml_data:
                     yaml_lower = {k.lower(): v for k, v in yaml_data.items()}
                     self.config.update(yaml_lower)
+        # Validate the configuration
+        validate_config(self.config)
 
     def get(self, key, default=None):
         return self.config.get(key.lower(), default)

@@ -1,14 +1,14 @@
 """
 Web Search Client module for executing web searches using Google Gemini.
 
-This module integrates with Google Gemini 2.5-flash to perform web searches
+This module integrates with Google Gemini to perform web searches
 using the built-in GoogleSearch tool, with caching and retry logic.
 """
 
 import hashlib
 from typing import List, Dict, Any
 from datetime import datetime, timezone
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from google import genai
 from google.genai import types
 import structlog
@@ -18,20 +18,27 @@ from ..config.config_loader import ConfigLoader
 logger = structlog.get_logger(__name__)
 
 
-def execute_web_search(queries: List[str], cache: Dict[str, Any]) -> List[Dict[str, Any]]:
+def execute_web_search(queries: List[str], cache: Dict[str, Any], research_context: bool = False) -> List[Dict[str, Any]]:
     """
     Execute web searches for a list of queries using Google Gemini with GoogleSearch tool.
 
     Checks cache first for each query. If not cached or stale, performs search with retries.
-    Updates cache with new results.
+    Updates cache with new results. Only allowed in research contexts.
 
     Args:
         queries: List of search query strings
         cache: Cache dictionary structure from CacheManager
+        research_context: Whether this search is for research purposes (must be True)
 
     Returns:
         List of search result dictionaries, one per query, containing query, results, etc.
+
+    Raises:
+        ValueError: If research_context is False, as google_search is restricted to research only.
     """
+    if not research_context:
+        raise ValueError("google_search tool can only be used in research contexts")
+
     config = ConfigLoader()
     api_key = config.get('google_genai_api_key')
     logger.info("Initializing web search client", api_key_available=bool(api_key))
@@ -61,7 +68,7 @@ def execute_web_search(queries: List[str], cache: Dict[str, Any]) -> List[Dict[s
 
         # Execute search
         logger.info("No valid cache, performing search for query", query=query)
-        finding = _perform_search(client, config_genai, query)
+        finding = _perform_search(client, config_genai, query, research_context)
         logger.info("Performed web search", query=query, results_count=len(finding))
 
         # Store in cache
@@ -80,7 +87,15 @@ def execute_web_search(queries: List[str], cache: Dict[str, Any]) -> List[Dict[s
 
 
 def _is_cache_valid(cached: Dict[str, Any]) -> bool:
-    """Check if cached item is still valid based on TTL."""
+    """
+    Check if cached item is still valid based on TTL.
+
+    Args:
+        cached: Cached item dictionary with timestamp and TTL
+
+    Returns:
+        True if cache is still valid, False if expired
+    """
     cached_at_str = cached.get("cached_at")
     if not cached_at_str:
         return False
@@ -96,15 +111,29 @@ def _is_cache_valid(cached: Dict[str, Any]) -> bool:
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-def _perform_search(client, config: types.GenerateContentConfig, query: str) -> Dict[str, Any]:
+def _perform_search(client: genai.Client, config: types.GenerateContentConfig, query: str, research_context: bool) -> Dict[str, Any]:
     """
     Perform a single web search using the Gemini client.
 
-    Parses the response to extract search results.
+    Parses the response to extract search results. Only allowed in research contexts.
+
+    Args:
+        client: Initialized Gemini client
+        config: Generation configuration with grounding tools
+        query: Search query string
+        research_context: Must be True for research usage
+
+    Returns:
+        Dictionary containing search results and synthesis text
+
+    Raises:
+        ValueError: If research_context is False
     """
+    if not research_context:
+        raise ValueError("google_search tool can only be used in research contexts")
     logger.info("Sending search request to Gemini", query=query)
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.0-flash",
         contents=f"Search the web for: {query}",
         config=config,
     )

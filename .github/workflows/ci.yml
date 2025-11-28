@@ -31,4 +31,4 @@ jobs:
         auto-activate: false # Prevent activating the base environment
     - name: Run tests
       run: |
-        python -m pytest tests/ --no-cov -q --disable-warnings
+        python -m pytest tests/ --no-cov -q --disable-warnings -m "not extensive"

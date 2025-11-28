@@ -1,31 +1,45 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from src.python.research.research_orchestrator import ResearchOrchestrator
+from src.python.research.deep_research_engine import DeepResearchEngine
+from src.python.research.llm_client import LLMClient
 
 
 class TestResearchOrchestrator:
     """Test suite for ResearchOrchestrator class."""
 
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
     @patch('src.python.research.research_orchestrator.CacheManager')
-    def test_init_with_dependencies(self, mock_cache_manager, mock_query_generator):
+    def test_init_with_dependencies(self, mock_cache_manager, mock_query_generator, mock_deep_engine, mock_llm_client):
         """Test initialization with provided dependencies."""
         mock_qg = MagicMock()
         mock_cm = MagicMock()
+        mock_de = MagicMock()
+        mock_llm = MagicMock()
 
-        orchestrator = ResearchOrchestrator(mock_qg, mock_cm)
+        orchestrator = ResearchOrchestrator(mock_qg, mock_cm, mock_de, mock_llm)
 
         assert orchestrator.query_generator == mock_qg
         assert orchestrator.cache_manager == mock_cm
+        assert orchestrator.deep_research_engine == mock_de
+        assert orchestrator.llm_client == mock_llm
 
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
     @patch('src.python.research.research_orchestrator.CacheManager')
-    def test_init_default_dependencies(self, mock_cache_manager, mock_query_generator):
+    def test_init_default_dependencies(self, mock_cache_manager, mock_query_generator, mock_deep_engine, mock_llm_client):
         """Test initialization with default dependencies."""
         mock_qg_instance = MagicMock()
         mock_cm_instance = MagicMock()
+        mock_de_instance = MagicMock()
+        mock_llm_instance = MagicMock()
         mock_query_generator.return_value = mock_qg_instance
         mock_cache_manager.return_value = mock_cm_instance
+        mock_deep_engine.return_value = mock_de_instance
+        mock_llm_client.return_value = mock_llm_instance
 
         orchestrator = ResearchOrchestrator()
 
@@ -34,12 +48,51 @@ class TestResearchOrchestrator:
         assert orchestrator.query_generator == mock_qg_instance
         assert orchestrator.cache_manager == mock_cm_instance
 
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
+    def test_deep_research_engine_lazy_instantiation(self, mock_deep_engine):
+        """Test that DeepResearchEngine is instantiated lazily when accessed."""
+        mock_de_instance = MagicMock()
+        mock_deep_engine.return_value = mock_de_instance
+
+        orchestrator = ResearchOrchestrator()
+
+        # Initially not instantiated
+        mock_deep_engine.assert_not_called()
+
+        # Access the property
+        engine = orchestrator.deep_research_engine
+
+        # Now it should be instantiated
+        mock_deep_engine.assert_called_once()
+        assert engine == mock_de_instance
+
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    def test_llm_client_lazy_instantiation(self, mock_llm_client):
+        """Test that LLMClient is instantiated lazily when accessed."""
+        mock_llm_instance = MagicMock()
+        mock_llm_client.return_value = mock_llm_instance
+
+        orchestrator = ResearchOrchestrator()
+
+        # Initially not instantiated
+        mock_llm_client.assert_not_called()
+
+        # Access the property
+        client = orchestrator.llm_client
+
+        # Now it should be instantiated
+        mock_llm_client.assert_called_once()
+        assert client == mock_llm_instance
+
     @patch('src.python.research.research_orchestrator.synthesize_market_data')
     @patch('src.python.research.research_orchestrator.parse_search_results')
     @patch('src.python.research.research_orchestrator.execute_web_search')
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
     def test_orchestrate_research_cache_hit_all_queries(self, mock_query_generator, mock_cache_manager,
+                                                        mock_deep_engine, mock_llm_client,
                                                         mock_execute_web_search, mock_parse_search_results,
                                                         mock_synthesize):
         """Test orchestrate_research when all queries have cache hits."""
@@ -80,9 +133,12 @@ class TestResearchOrchestrator:
     @patch('src.python.research.research_orchestrator.synthesize_market_data')
     @patch('src.python.research.research_orchestrator.parse_search_results')
     @patch('src.python.research.research_orchestrator.execute_web_search')
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
     def test_orchestrate_research_cache_miss_all_queries(self, mock_query_generator, mock_cache_manager,
+                                                         mock_deep_engine, mock_llm_client,
                                                          mock_execute_web_search, mock_parse_search_results,
                                                          mock_synthesize):
         """Test orchestrate_research when all queries miss cache."""
@@ -137,9 +193,12 @@ class TestResearchOrchestrator:
     @patch('src.python.research.research_orchestrator.synthesize_market_data')
     @patch('src.python.research.research_orchestrator.parse_search_results')
     @patch('src.python.research.research_orchestrator.execute_web_search')
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
     def test_orchestrate_research_mixed_cache_hits_misses(self, mock_query_generator, mock_cache_manager,
+                                                          mock_deep_engine, mock_llm_client,
                                                           mock_execute_web_search, mock_parse_search_results,
                                                           mock_synthesize):
         """Test orchestrate_research with mixed cache hits and misses."""
@@ -191,9 +250,11 @@ class TestResearchOrchestrator:
         assert "combined" in result
 
     @patch('src.python.research.research_orchestrator.synthesize_market_data')
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
-    def test_orchestrate_research_low_confidence_flag(self, mock_query_generator, mock_cache_manager, mock_synthesize):
+    def test_orchestrate_research_low_confidence_flag(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client, mock_synthesize):
         """Test orchestrate_research flags low confidence data."""
         # Setup mocks
         mock_qg = MagicMock()
@@ -221,9 +282,11 @@ class TestResearchOrchestrator:
         assert "low_confidence_data_detected" in result["flags"]
 
     @patch('src.python.research.research_orchestrator.synthesize_market_data')
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
-    def test_orchestrate_research_high_confidence_no_flag(self, mock_query_generator, mock_cache_manager, mock_synthesize):
+    def test_orchestrate_research_high_confidence_no_flag(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client, mock_synthesize):
         """Test orchestrate_research does not flag high confidence data."""
         # Setup mocks
         mock_qg = MagicMock()
@@ -252,9 +315,12 @@ class TestResearchOrchestrator:
     @patch('src.python.research.research_orchestrator.synthesize_market_data')
     @patch('src.python.research.research_orchestrator.parse_search_results')
     @patch('src.python.research.research_orchestrator.execute_web_search')
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
     def test_orchestrate_research_finding_extraction(self, mock_query_generator, mock_cache_manager,
+                                                     mock_deep_engine, mock_llm_client,
                                                      mock_execute_web_search, mock_parse_search_results,
                                                      mock_synthesize):
         """Test that findings are properly extracted from parsed results."""
@@ -302,9 +368,11 @@ class TestResearchOrchestrator:
         mock_synthesize.assert_called_once()
 
     @patch('src.python.research.research_orchestrator.synthesize_market_data')
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
-    def test_orchestrate_research_empty_queries(self, mock_query_generator, mock_cache_manager, mock_synthesize):
+    def test_orchestrate_research_empty_queries(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client, mock_synthesize):
         """Test orchestrate_research with empty query list."""
         # Setup mocks
         mock_qg = MagicMock()
@@ -328,9 +396,12 @@ class TestResearchOrchestrator:
     @patch('src.python.research.research_orchestrator.synthesize_market_data')
     @patch('src.python.research.research_orchestrator.parse_search_results')
     @patch('src.python.research.research_orchestrator.execute_web_search')
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
     def test_orchestrate_research_multiple_queries_processing(self, mock_query_generator, mock_cache_manager,
+                                                              mock_deep_engine, mock_llm_client,
                                                               mock_execute_web_search, mock_parse_search_results,
                                                               mock_synthesize):
         """Test orchestrate_research processes multiple queries correctly."""
@@ -375,3 +446,103 @@ class TestResearchOrchestrator:
         # Should have 4 findings passed to synthesizer
         args = mock_synthesize.call_args[0][0]
         assert len(args) == 4  # 4 findings
+
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
+    @patch('src.python.research.research_orchestrator.CacheManager')
+    @patch('src.python.research.research_orchestrator.QueryGenerator')
+    def test_orchestrate_research_deep_mode_success(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client):
+        """Test orchestrate_research in deep mode with valid brand_config."""
+        # Setup mocks
+        mock_qg = MagicMock()
+        mock_query_generator.return_value = mock_qg
+
+        mock_cm = MagicMock()
+        mock_cache_manager.return_value = mock_cm
+
+        mock_de = MagicMock()
+        mock_de.conduct_deep_research.return_value = {"deep_result": "success"}
+        mock_deep_engine.return_value = mock_de
+
+        brand_config = {"BRAND_NAME": "Test Brand", "BRAND_INDUSTRY": "Test Industry"}
+
+        orchestrator = ResearchOrchestrator(mock_qg, mock_cm, mock_de)
+        result = orchestrator.orchestrate_research("clinic", "medical", "Indonesia", research_mode="deep", brand_config=brand_config)
+
+        # Verify deep research engine was called
+        mock_de.conduct_deep_research.assert_called_once_with(brand_config)
+        assert result == {"deep_result": "success"}
+
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
+    @patch('src.python.research.research_orchestrator.CacheManager')
+    @patch('src.python.research.research_orchestrator.QueryGenerator')
+    def test_orchestrate_research_deep_mode_missing_brand_config(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client):
+        """Test orchestrate_research in deep mode raises error when brand_config is missing."""
+        # Setup mocks
+        mock_qg = MagicMock()
+        mock_query_generator.return_value = mock_qg
+
+        mock_cm = MagicMock()
+        mock_cache_manager.return_value = mock_cm
+
+        mock_de = MagicMock()
+        mock_deep_engine.return_value = mock_de
+
+        orchestrator = ResearchOrchestrator(mock_qg, mock_cm, mock_de)
+
+        with pytest.raises(ValueError, match="brand_config is required for deep research mode"):
+            orchestrator.orchestrate_research("clinic", "medical", "Indonesia", research_mode="deep")
+
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
+    @patch('src.python.research.research_orchestrator.CacheManager')
+    @patch('src.python.research.research_orchestrator.QueryGenerator')
+    def test_orchestrate_research_invalid_mode(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client):
+        """Test orchestrate_research raises error for invalid research mode."""
+        # Setup mocks
+        mock_qg = MagicMock()
+        mock_query_generator.return_value = mock_qg
+
+        mock_cm = MagicMock()
+        mock_cache_manager.return_value = mock_cm
+
+        mock_de = MagicMock()
+        mock_deep_engine.return_value = mock_de
+
+        orchestrator = ResearchOrchestrator(mock_qg, mock_cm, mock_de)
+
+        with pytest.raises(ValueError, match="Unsupported research mode: invalid"):
+            orchestrator.orchestrate_research("clinic", "medical", "Indonesia", research_mode="invalid")
+
+    @patch('src.python.research.research_orchestrator.LLMClient')
+    @patch('src.python.research.research_orchestrator.DeepResearchEngine')
+    @patch('src.python.research.research_orchestrator.CacheManager')
+    @patch('src.python.research.research_orchestrator.QueryGenerator')
+    def test_orchestrate_research_backward_compatibility(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client):
+        """Test that existing calls without research_mode still work (backward compatibility)."""
+        # Setup mocks for basic mode
+        mock_qg = MagicMock()
+        mock_qg.generate_research_queries.return_value = ["query1"]
+        mock_query_generator.return_value = mock_qg
+
+        mock_cm = MagicMock()
+        mock_cm.hash_query.return_value = "hash_query1"
+        mock_cm.get_cached_result.return_value = {
+            "results": [{"title": "Result", "url": "https://ex.com", "snippet": "Snippet", "confidence": 0.8}]
+        }
+        mock_cache_manager.return_value = mock_cm
+
+        mock_de = MagicMock()
+        mock_deep_engine.return_value = mock_de
+
+        with patch('src.python.research.research_orchestrator.synthesize_market_data') as mock_synthesize:
+            mock_synthesize.return_value = {"overall": {"average_confidence": 0.8}}
+
+            orchestrator = ResearchOrchestrator(mock_qg, mock_cm, mock_de)
+            result = orchestrator.orchestrate_research("clinic", "medical", "Indonesia")  # no research_mode specified
+
+            # Should use basic mode by default
+            mock_de.conduct_deep_research.assert_not_called()
+            mock_synthesize.assert_called_once()
+            assert "overall" in result
