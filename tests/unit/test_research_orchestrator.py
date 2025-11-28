@@ -415,10 +415,11 @@ class TestResearchOrchestrator:
         args = mock_synthesize.call_args[0][0]
         assert len(args) == 4  # 4 findings
 
+    @patch('src.python.research.research_orchestrator.LLMClient')
     @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
-    def test_orchestrate_research_deep_mode_success(self, mock_query_generator, mock_cache_manager, mock_deep_engine):
+    def test_orchestrate_research_deep_mode_success(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client):
         """Test orchestrate_research in deep mode with valid brand_config."""
         # Setup mocks
         mock_qg = MagicMock()
@@ -440,10 +441,11 @@ class TestResearchOrchestrator:
         mock_de.conduct_deep_research.assert_called_once_with(brand_config)
         assert result == {"deep_result": "success"}
 
+    @patch('src.python.research.research_orchestrator.LLMClient')
     @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
-    def test_orchestrate_research_deep_mode_missing_brand_config(self, mock_query_generator, mock_cache_manager, mock_deep_engine):
+    def test_orchestrate_research_deep_mode_missing_brand_config(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client):
         """Test orchestrate_research in deep mode raises error when brand_config is missing."""
         # Setup mocks
         mock_qg = MagicMock()
@@ -460,10 +462,11 @@ class TestResearchOrchestrator:
         with pytest.raises(ValueError, match="brand_config is required for deep research mode"):
             orchestrator.orchestrate_research("clinic", "medical", "Indonesia", research_mode="deep")
 
+    @patch('src.python.research.research_orchestrator.LLMClient')
     @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
-    def test_orchestrate_research_invalid_mode(self, mock_query_generator, mock_cache_manager, mock_deep_engine):
+    def test_orchestrate_research_invalid_mode(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client):
         """Test orchestrate_research raises error for invalid research mode."""
         # Setup mocks
         mock_qg = MagicMock()
@@ -480,10 +483,11 @@ class TestResearchOrchestrator:
         with pytest.raises(ValueError, match="Unsupported research mode: invalid"):
             orchestrator.orchestrate_research("clinic", "medical", "Indonesia", research_mode="invalid")
 
+    @patch('src.python.research.research_orchestrator.LLMClient')
     @patch('src.python.research.research_orchestrator.DeepResearchEngine')
     @patch('src.python.research.research_orchestrator.CacheManager')
     @patch('src.python.research.research_orchestrator.QueryGenerator')
-    def test_orchestrate_research_backward_compatibility(self, mock_query_generator, mock_cache_manager, mock_deep_engine):
+    def test_orchestrate_research_backward_compatibility(self, mock_query_generator, mock_cache_manager, mock_deep_engine, mock_llm_client):
         """Test that existing calls without research_mode still work (backward compatibility)."""
         # Setup mocks for basic mode
         mock_qg = MagicMock()

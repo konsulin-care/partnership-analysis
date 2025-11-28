@@ -58,8 +58,9 @@ def sample_further_questions():
 class TestDeepResearchEngine:
     """Test suite for DeepResearchEngine class."""
 
+    @patch('src.python.research.deep_research_engine.LLMClient')
     @patch('src.python.research.deep_research_engine.ConfigLoader')
-    def test_initialization_with_valid_config(self, mock_config_loader):
+    def test_initialization_with_valid_config(self, mock_config_loader, mock_llm_client):
         """Test engine initialization with valid configuration."""
         mock_config = MagicMock()
         mock_config.get.side_effect = lambda key, default=None: {
@@ -68,22 +69,25 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 1
         }.get(key, default)
 
-        engine = DeepResearchEngine(config=mock_config)
+        mock_llm = MagicMock()
+        engine = DeepResearchEngine(config=mock_config, llm_client=mock_llm)
 
         assert engine.max_iterations == 3
         assert engine.iteration_timeout == 300
         assert engine.min_questions_for_gap == 1
-        assert isinstance(engine.llm_client, LLMClient)
+        assert engine.llm_client == mock_llm
         assert isinstance(engine.query_generator, QueryGenerator)
         assert isinstance(engine.cache_manager, CacheManager)
 
+    @patch('src.python.research.deep_research_engine.LLMClient')
     @patch('src.python.research.deep_research_engine.ConfigLoader')
-    def test_initialization_with_invalid_config(self, mock_config_loader):
+    def test_initialization_with_invalid_config(self, mock_config_loader, mock_llm_client):
         """Test engine initialization with invalid configuration."""
         mock_config = MagicMock()
         mock_config.get.return_value = None  # Invalid config - returns None for all keys
 
-        engine = DeepResearchEngine(config=mock_config)
+        mock_llm = MagicMock()
+        engine = DeepResearchEngine(config=mock_config, llm_client=mock_llm)
 
         # Should use defaults from the code (not from config.get default parameter)
         # Since config.get returns None, the engine should handle None values
@@ -93,6 +97,7 @@ class TestDeepResearchEngine:
         assert engine.max_iterations is None or engine.max_iterations == 3
         assert engine.iteration_timeout is None or engine.iteration_timeout == 300
         assert engine.min_questions_for_gap is None or engine.min_questions_for_gap == 1
+        assert engine.llm_client == mock_llm
 
     @patch('src.python.research.deep_research_engine.ConfigLoader')
     @patch('src.python.research.deep_research_engine.CacheManager')
