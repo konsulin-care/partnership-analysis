@@ -20,6 +20,7 @@ DEFAULTS = {
     'cache_backend': 'json_file',
     'cache_file_path': './cache/research_cache.json',
     'cache_auto_cleanup_days': 90,
+    'web_search_timeout': 30,
     'log_level': 'INFO',
     'log_format': 'json',
     'log_file': './logs/execution.log',
@@ -28,5 +29,12 @@ DEFAULTS = {
     'brand_name': "Konsulin",
     'brand_about': "Providing booking management system through WhatsApp",
     'brand_address': "Jakarta",
-    'brand_industry': "IT Service"
+    'brand_industry': "IT Service",
+    'deep_research_max_iterations': 3,
+    'deep_research_model_search': 'gemini-2.0-flash',
+    'deep_research_model_synthesis': 'gemini-2.5-flash',
+    'deep_research_model_questions': 'gemini-2.5-flash',
+    'deep_research_iteration_timeout': 300,
+    'deep_research_cache_ttl_days': 7,
+    'deep_research_gap_threshold': 3
 }
