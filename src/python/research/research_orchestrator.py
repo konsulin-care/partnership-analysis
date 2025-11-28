@@ -46,8 +46,20 @@ class ResearchOrchestrator:
         """
         self.query_generator = query_generator or QueryGenerator()
         self.cache_manager = cache_manager or CacheManager()
-        self.deep_research_engine = deep_research_engine or DeepResearchEngine()
-        self.llm_client = llm_client or LLMClient()
+        self._deep_research_engine = deep_research_engine
+        self._llm_client = llm_client
+
+    @property
+    def deep_research_engine(self) -> DeepResearchEngine:
+        if self._deep_research_engine is None:
+            self._deep_research_engine = DeepResearchEngine()
+        return self._deep_research_engine
+
+    @property
+    def llm_client(self) -> LLMClient:
+        if self._llm_client is None:
+            self._llm_client = LLMClient()
+        return self._llm_client
 
     def orchestrate_research(
         self,
