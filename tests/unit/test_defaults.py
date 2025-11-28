@@ -50,3 +50,7 @@ class TestDefaults:
         assert isinstance(DEFAULTS['deep_research_cache_ttl_days'], int)
         assert DEFAULTS['deep_research_gap_threshold'] == 3
         assert isinstance(DEFAULTS['deep_research_gap_threshold'], int)
+
+    def test_llm_rate_limit_delay_seconds(self):
+        assert DEFAULTS['llm_rate_limit_delay_seconds'] == 10
+        assert isinstance(DEFAULTS['llm_rate_limit_delay_seconds'], int)

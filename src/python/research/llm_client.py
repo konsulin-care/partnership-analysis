@@ -7,6 +7,7 @@ logging, and configuration loading.
 """
 
 import json
+import time
 from typing import Dict, Any, List, Optional
 import structlog
 from google import genai
@@ -49,7 +50,9 @@ class LLMClient:
 
         # Initialize the client with API key
         self.client = genai.Client(api_key=self.api_key)
-        logger.info("LLMClient initialized", supported_models=list(self.SUPPORTED_MODELS.keys()))
+        self.rate_limit_delay = self.config.get('llm_rate_limit_delay_seconds', 10)
+        self.last_call_time = 0.0
+        logger.info("LLMClient initialized", supported_models=list(self.SUPPORTED_MODELS.keys()), rate_limit_delay=self.rate_limit_delay)
 
     # Removed _initialize_clients as we use a single client instance
 
@@ -71,6 +74,14 @@ class LLMClient:
         if model_name not in self.SUPPORTED_MODELS:
             raise LLMClientError(f"Unsupported model: {model_name}. Supported: {list(self.SUPPORTED_MODELS.keys())}")
 
+        # Enforce rate limiting
+        current_time = time.time()
+        time_since_last = current_time - self.last_call_time
+        if time_since_last < self.rate_limit_delay:
+            sleep_time = self.rate_limit_delay - time_since_last
+            logger.info(f"Rate limiting: sleeping for {sleep_time:.2f} seconds before API call")
+            time.sleep(sleep_time)
+
         # Create generation config with best practices for high quality and reproducible results
         config = types.GenerateContentConfig(
             temperature=kwargs.get('temperature', 0.7),
@@ -89,6 +100,7 @@ class LLMClient:
                 config=config
             )
             response_text = response.text.strip()
+            self.last_call_time = time.time()
             logger.info("Prompt executed successfully", model=model_name, response_length=len(response_text))
             return response_text
         except Exception as e:

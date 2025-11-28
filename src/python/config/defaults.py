@@ -36,5 +36,6 @@ DEFAULTS = {
     'deep_research_model_questions': 'gemini-2.5-flash',
     'deep_research_iteration_timeout': 300,
     'deep_research_cache_ttl_days': 7,
-    'deep_research_gap_threshold': 3
+    'deep_research_gap_threshold': 3,
+    'llm_rate_limit_delay_seconds': 10
 }

@@ -93,3 +93,15 @@ class TestConfigLoader:
             assert loader.get('deep_research_cache_ttl_days') == '10'
             # Others should still be defaults
             assert loader.get('deep_research_model_synthesis') == 'gemini-2.5-flash'
+
+    def test_llm_rate_limit_delay_seconds_loaded(self):
+        # Test that llm_rate_limit_delay_seconds is loaded from defaults
+        with patch('os.environ', {}):
+            loader = ConfigLoader(env_path='/nonexistent')
+            assert loader.get('llm_rate_limit_delay_seconds') == 10
+
+    def test_llm_rate_limit_delay_seconds_from_env(self):
+        # Test that llm_rate_limit_delay_seconds can be overridden from env
+        with patch.dict(os.environ, {'llm_rate_limit_delay_seconds': '15'}):
+            loader = ConfigLoader(env_path='/nonexistent')
+            assert loader.get('llm_rate_limit_delay_seconds') == '15'  # string from env
