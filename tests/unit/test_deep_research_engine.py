@@ -214,18 +214,18 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 1
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query 1"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query 1"]
 
-        mock_llm_client.adjust_search_terms.side_effect = lambda q, c: f"adjusted_{q}"
-        mock_llm_client.synthesize_findings.return_value = sample_iteration_synthesis
-        mock_llm_client.generate_questions.side_effect = [
+        mock_llm_client.return_value.adjust_search_terms.side_effect = lambda q, c: f"adjusted_{q}"
+        mock_llm_client.return_value.synthesize_findings.return_value = sample_iteration_synthesis
+        mock_llm_client.return_value.generate_questions.side_effect = [
             sample_further_questions,  # First iteration: has questions
             []  # Second iteration: no more questions
         ]
-        mock_llm_client.execute_prompt.return_value = "Final synthesis result"
+        mock_llm_client.return_value.execute_prompt.return_value = "Final synthesis result"
 
         mock_execute_web_search.return_value = sample_search_results
 
@@ -238,8 +238,8 @@ class TestDeepResearchEngine:
         assert result['total_iterations'] == 2
 
         # Verify LLM calls
-        assert mock_llm.generate_questions.call_count == 2
-        assert mock_llm.execute_prompt.call_count == 1  # Final synthesis
+        assert mock_llm_client.return_value.generate_questions.call_count == 2
+        assert mock_llm_client.return_value.execute_prompt.call_count == 1  # Final synthesis
 
     @patch('src.python.research.deep_research_engine.CacheManager')
     @patch('src.python.research.deep_research_engine.QueryGenerator')
@@ -258,15 +258,15 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 1
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query"]
 
-        mock_llm_client.adjust_search_terms.side_effect = lambda q, c: f"adjusted_{q}"
-        mock_llm_client.synthesize_findings.return_value = sample_iteration_synthesis
-        mock_llm_client.generate_questions.return_value = sample_further_questions  # Always has questions
-        mock_llm_client.execute_prompt.return_value = "Final synthesis"
+        mock_llm_client.return_value.adjust_search_terms.side_effect = lambda q, c: f"adjusted_{q}"
+        mock_llm_client.return_value.synthesize_findings.return_value = sample_iteration_synthesis
+        mock_llm_client.return_value.generate_questions.return_value = sample_further_questions  # Always has questions
+        mock_llm_client.return_value.execute_prompt.return_value = "Final synthesis"
 
         mock_execute_web_search.return_value = sample_search_results
 
@@ -295,10 +295,10 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 2
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query"]
 
         mock_llm_client.adjust_search_terms.return_value = "adjusted_test query"
         mock_llm_client.synthesize_findings.return_value = sample_iteration_synthesis
@@ -312,11 +312,11 @@ class TestDeepResearchEngine:
         result = engine.conduct_deep_research(sample_brand_config)
 
         # Verify cache was checked and result was stored
-        mock_cache.get_cached_result.assert_called_once()
-        mock_cache.cache_research_findings.assert_called_once()
+        mock_cache_manager.return_value.get_cached_result.assert_called_once()
+        mock_cache_manager.return_value.cache_research_findings.assert_called_once()
 
         # Verify cached result structure
-        cache_call_args = mock_cache.cache_research_findings.call_args
+        cache_call_args = mock_cache_manager.return_value.cache_research_findings.call_args
         cache_key = cache_call_args[0][0]
         cache_data = cache_call_args[0][1]
         assert 'query' in cache_data
@@ -340,15 +340,15 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 2
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query"]
 
-        mock_llm_client.adjust_search_terms.side_effect = LLMClientError("API Error")
-        mock_llm_client.synthesize_findings.return_value = sample_iteration_synthesis
-        mock_llm_client.generate_questions.return_value = []
-        mock_llm_client.execute_prompt.return_value = "Final synthesis"
+        mock_llm_client.return_value.adjust_search_terms.side_effect = LLMClientError("API Error")
+        mock_llm_client.return_value.synthesize_findings.return_value = sample_iteration_synthesis
+        mock_llm_client.return_value.generate_questions.return_value = []
+        mock_llm_client.return_value.execute_prompt.return_value = "Final synthesis"
 
         mock_execute_web_search.return_value = sample_search_results
 
@@ -377,15 +377,15 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 2
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query"]
 
-        mock_llm_client.adjust_search_terms.return_value = "adjusted_test query"
-        mock_llm_client.synthesize_findings.side_effect = LLMClientError("Synthesis API Error")
-        mock_llm_client.generate_questions.return_value = []
-        mock_llm_client.execute_prompt.return_value = "Final synthesis"
+        mock_llm_client.return_value.adjust_search_terms.return_value = "adjusted_test query"
+        mock_llm_client.return_value.synthesize_findings.side_effect = LLMClientError("Synthesis API Error")
+        mock_llm_client.return_value.generate_questions.return_value = []
+        mock_llm_client.return_value.execute_prompt.return_value = "Final synthesis"
 
         mock_execute_web_search.return_value = sample_search_results
 
@@ -415,15 +415,15 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 2
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query"]
 
-        mock_llm_client.adjust_search_terms.return_value = "adjusted_test query"
-        mock_llm_client.synthesize_findings.return_value = sample_iteration_synthesis
-        mock_llm_client.generate_questions.return_value = []
-        mock_llm_client.execute_prompt.return_value = "Comprehensive final synthesis with brand-specific insights"
+        mock_llm_client.return_value.adjust_search_terms.return_value = "adjusted_test query"
+        mock_llm_client.return_value.synthesize_findings.return_value = sample_iteration_synthesis
+        mock_llm_client.return_value.generate_questions.return_value = []
+        mock_llm_client.return_value.execute_prompt.return_value = "Comprehensive final synthesis with brand-specific insights"
 
         mock_execute_web_search.return_value = sample_search_results
 
@@ -432,8 +432,8 @@ class TestDeepResearchEngine:
         result = engine.conduct_deep_research(sample_brand_config)
 
         # Verify final synthesis was called
-        assert mock_llm.execute_prompt.call_count == 1
-        call_args = mock_llm.execute_prompt.call_args
+        assert mock_llm_client.return_value.execute_prompt.call_count == 1
+        call_args = mock_llm_client.return_value.execute_prompt.call_args
         prompt = call_args[0][1]  # Second argument is the prompt
 
         # Verify prompt contains brand-specific content
@@ -490,15 +490,15 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 1
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query"]
 
-        mock_llm_client.adjust_search_terms.return_value = "adjusted_test query"
-        mock_llm_client.synthesize_findings.return_value = sample_iteration_synthesis
-        mock_llm_client.generate_questions.return_value = sample_further_questions
-        mock_llm_client.execute_prompt.return_value = "Final synthesis"
+        mock_llm_client.return_value.adjust_search_terms.return_value = "adjusted_test query"
+        mock_llm_client.return_value.synthesize_findings.return_value = sample_iteration_synthesis
+        mock_llm_client.return_value.generate_questions.return_value = sample_further_questions
+        mock_llm_client.return_value.execute_prompt.return_value = "Final synthesis"
 
         mock_execute_web_search.return_value = sample_search_results
 
@@ -530,15 +530,15 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 1
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query"]
 
-        mock_llm_client.adjust_search_terms.return_value = "adjusted_test query"
-        mock_llm_client.synthesize_findings.return_value = sample_iteration_synthesis
-        mock_llm_client.generate_questions.return_value = []  # No questions generated
-        mock_llm_client.execute_prompt.return_value = "Final synthesis"
+        mock_llm_client.return_value.adjust_search_terms.return_value = "adjusted_test query"
+        mock_llm_client.return_value.synthesize_findings.return_value = sample_iteration_synthesis
+        mock_llm_client.return_value.generate_questions.return_value = []  # No questions generated
+        mock_llm_client.return_value.execute_prompt.return_value = "Final synthesis"
 
         mock_execute_web_search.return_value = sample_search_results
 
@@ -566,15 +566,15 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 2
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query"]
 
-        mock_llm_client.adjust_search_terms.return_value = "adjusted_test query"
-        mock_llm_client.synthesize_findings.return_value = "Synthesis from empty results"
-        mock_llm_client.generate_questions.return_value = []
-        mock_llm_client.execute_prompt.return_value = "Final synthesis"
+        mock_llm_client.return_value.adjust_search_terms.return_value = "adjusted_test query"
+        mock_llm_client.return_value.synthesize_findings.return_value = "Synthesis from empty results"
+        mock_llm_client.return_value.generate_questions.return_value = []
+        mock_llm_client.return_value.execute_prompt.return_value = "Final synthesis"
 
         mock_execute_web_search.return_value = []  # Empty results
 
@@ -603,20 +603,25 @@ class TestDeepResearchEngine:
             'min_questions_for_research_gap': 2
         }.get(key, default)
 
-        mock_cache_manager.get_cached_result.return_value = None
-        mock_cache_manager.cache = MagicMock()
+        mock_cache_manager.return_value.get_cached_result.return_value = None
+        mock_cache_manager.return_value.cache = MagicMock()
 
-        mock_query_generator.generate_brand_research_queries.return_value = ["test query"]
+        mock_query_generator.return_value.generate_brand_research_queries.return_value = ["test query"]
 
-        mock_llm_client.adjust_search_terms.return_value = "adjusted_test query"
-        mock_llm_client.synthesize_findings.return_value = "Synthesis"
-        mock_llm_client.generate_questions.return_value = []
-        mock_llm_client.execute_prompt.return_value = "Final synthesis"
+        mock_llm_client.return_value.adjust_search_terms.return_value = "adjusted_test query"
+        mock_llm_client.return_value.synthesize_findings.return_value = "Synthesis"
+        mock_llm_client.return_value.generate_questions.return_value = []
+        mock_llm_client.return_value.execute_prompt.return_value = "Final synthesis"
 
         mock_execute_web_search.side_effect = Exception("Web search API error")
 
         engine = DeepResearchEngine(config=mock_config)
 
-        # Should raise the exception (web search failure is not caught)
-        with pytest.raises(Exception, match="Web search API error"):
-            engine.conduct_deep_research(sample_brand_config)
+        # Should handle the exception gracefully and complete with partial results
+        result = engine.conduct_deep_research(sample_brand_config)
+
+        # Should complete with 0 iterations (failed on first attempt before adding iteration)
+        assert len(result['iterations']) == 0
+        assert result['total_iterations'] == 0
+        # Final synthesis should still be called
+        assert result['final_synthesis'] == "Final synthesis"
