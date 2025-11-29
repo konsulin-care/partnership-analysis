@@ -219,7 +219,15 @@ def _build_scenario_comparison_table(standalone: Dict[str, Any], hub: Dict[str, 
 def _build_three_year_projection_table(financial_data: Dict[str, Any]) -> Dict[str, Any]:
     """Build three-year savings projection table."""
     # This is a simplified projection - in real implementation, calculate year-by-year
-    year_1_savings = financial_data.get('year_1_revenue_idr', 0) * 0.1  # Placeholder calculation
+    scenarios = financial_data.get('scenarios', [])
+    standalone = next((s for s in scenarios if s.get('name') == 'standalone'), {})
+    hub = next((s for s in scenarios if s.get('name') == 'hub'), {})
+    
+    cost_standalone = sum(standalone.get('monthly_costs', {}).values())
+    cost_hub = sum(hub.get('monthly_costs', {}).values())
+    monthly_savings = cost_standalone - cost_hub
+    
+    year_1_savings = monthly_savings * 12
     year_2_savings = year_1_savings * 1.05  # 5% growth
     year_3_savings = year_2_savings * 1.05
     total_savings = year_1_savings + year_2_savings + year_3_savings
