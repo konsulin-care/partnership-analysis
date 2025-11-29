@@ -165,7 +165,7 @@ def test_build_executive_summary(mock_normalized_data):
     assert 'key_findings' in result
     assert len(result['key_findings']) == 3
     assert '25.0% reduction' in result['key_findings'][0]
-    assert '50.0 months faster' in result['key_findings'][1]
+    assert '50.0% faster break-even timeline' in result['key_findings'][1]
 
 
 def test_build_partnership_overview(mock_normalized_data):
