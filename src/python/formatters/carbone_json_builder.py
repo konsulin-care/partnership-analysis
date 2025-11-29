@@ -121,7 +121,7 @@ def _build_executive_summary(financial_data: Dict[str, Any], partnership_terms: 
         "headline": "Partnership Model Delivers Superior Financial Outcomes",
         "key_findings": [
             f"{capex_reduction:.1f}% reduction in initial capital requirements",
-            f"{breakeven_improvement:.1f} months faster break-even timeline",
+            f"{breakeven_improvement:.1f}% faster break-even timeline",
             f"IDR {savings_3yr:,.0f} in cumulative savings over three years"
         ]
     }
