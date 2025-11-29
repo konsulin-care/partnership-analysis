@@ -38,5 +38,35 @@ def validate_config(config):
         raise ValueError("deep_research_cache_ttl_days must be an integer >= 1")
     if not is_int_like(config.get('deep_research_gap_threshold')) or int(config.get('deep_research_gap_threshold')) < 1:
         raise ValueError("deep_research_gap_threshold must be an integer >= 1")
+    # Validate formatter output paths
+    output_patterns = [
+        'output_csv_file_pattern',
+        'output_json_file_pattern',
+        'output_bibtex_file_pattern',
+        'output_pdf_file_pattern',
+        'output_txt_file_pattern'
+    ]
+    for pattern in output_patterns:
+        if not isinstance(config.get(pattern), str) or not config.get(pattern):
+            raise ValueError(f"{pattern} must be a non-empty string")
+    # Validate formatting options
+    if not isinstance(config.get('csv_delimiter'), str) or len(config.get('csv_delimiter')) != 1:
+        raise ValueError("csv_delimiter must be a single character string")
+    if not is_int_like(config.get('json_indent')) or int(config.get('json_indent')) < 0:
+        raise ValueError("json_indent must be an integer >= 0")
+    if not isinstance(config.get('bibtex_style'), str) or not config.get('bibtex_style'):
+        raise ValueError("bibtex_style must be a non-empty string")
+    # Validate Carbone configuration
+    if not isinstance(config.get('carbone_template_id'), str):
+        raise ValueError("carbone_template_id must be a string")
+    if not isinstance(config.get('carbone_api_version'), str) or not config.get('carbone_api_version'):
+        raise ValueError("carbone_api_version must be a non-empty string")
+    if not is_int_like(config.get('carbone_render_timeout')) or int(config.get('carbone_render_timeout')) <= 0:
+        raise ValueError("carbone_render_timeout must be an integer > 0")
+    # Validate TXT intermediary preferences
+    if not isinstance(config.get('txt_section_separator'), str):
+        raise ValueError("txt_section_separator must be a string")
+    if not isinstance(config.get('txt_include_timestamps'), bool):
+        raise ValueError("txt_include_timestamps must be a boolean")
     # Add more validations as needed
     return True

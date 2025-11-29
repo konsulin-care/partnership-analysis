@@ -16,7 +16,20 @@ class TestValidateConfig:
             'deep_research_model_questions': 'gemini-2.5-flash',
             'deep_research_iteration_timeout': 300,
             'deep_research_cache_ttl_days': 7,
-            'deep_research_gap_threshold': 3
+            'deep_research_gap_threshold': 3,
+            'output_csv_file_pattern': 'financial_data_{timestamp}.csv',
+            'output_json_file_pattern': 'report_data_{timestamp}.json',
+            'output_bibtex_file_pattern': 'references_{timestamp}.bib',
+            'output_pdf_file_pattern': 'partnership_report_{timestamp}.pdf',
+            'output_txt_file_pattern': 'intermediary_{timestamp}.txt',
+            'csv_delimiter': ',',
+            'json_indent': 2,
+            'bibtex_style': 'plain',
+            'carbone_template_id': '',
+            'carbone_api_version': 'v3',
+            'carbone_render_timeout': 60,
+            'txt_section_separator': '\n\n---\n\n',
+            'txt_include_timestamps': True
         }
         assert validate_config(config) is True
 
@@ -41,7 +54,20 @@ class TestValidateConfig:
             'deep_research_model_questions': 'gemini-2.5-flash',
             'deep_research_iteration_timeout': 300,
             'deep_research_cache_ttl_days': 7,
-            'deep_research_gap_threshold': 3
+            'deep_research_gap_threshold': 3,
+            'output_csv_file_pattern': 'financial_data_{timestamp}.csv',
+            'output_json_file_pattern': 'report_data_{timestamp}.json',
+            'output_bibtex_file_pattern': 'references_{timestamp}.bib',
+            'output_pdf_file_pattern': 'partnership_report_{timestamp}.pdf',
+            'output_txt_file_pattern': 'intermediary_{timestamp}.txt',
+            'csv_delimiter': ',',
+            'json_indent': 2,
+            'bibtex_style': 'plain',
+            'carbone_template_id': '',
+            'carbone_api_version': 'v3',
+            'carbone_render_timeout': 60,
+            'txt_section_separator': '\n\n---\n\n',
+            'txt_include_timestamps': True
         }
         with pytest.raises(ValueError, match="research_cache_ttl_days must be an integer"):
             validate_config(config)
@@ -58,7 +84,20 @@ class TestValidateConfig:
             'deep_research_model_questions': 'gemini-2.5-flash',
             'deep_research_iteration_timeout': 300,
             'deep_research_cache_ttl_days': 7,
-            'deep_research_gap_threshold': 3
+            'deep_research_gap_threshold': 3,
+            'output_csv_file_pattern': 'financial_data_{timestamp}.csv',
+            'output_json_file_pattern': 'report_data_{timestamp}.json',
+            'output_bibtex_file_pattern': 'references_{timestamp}.bib',
+            'output_pdf_file_pattern': 'partnership_report_{timestamp}.pdf',
+            'output_txt_file_pattern': 'intermediary_{timestamp}.txt',
+            'csv_delimiter': ',',
+            'json_indent': 2,
+            'bibtex_style': 'plain',
+            'carbone_template_id': '',
+            'carbone_api_version': 'v3',
+            'carbone_render_timeout': 60,
+            'txt_section_separator': '\n\n---\n\n',
+            'txt_include_timestamps': True
         }
         with pytest.raises(ValueError, match="deep_research_max_iterations must be an integer >= 1"):
             validate_config(config)
@@ -75,7 +114,20 @@ class TestValidateConfig:
             'deep_research_model_questions': 'gemini-2.5-flash',
             'deep_research_iteration_timeout': 300,
             'deep_research_cache_ttl_days': 7,
-            'deep_research_gap_threshold': 3
+            'deep_research_gap_threshold': 3,
+            'output_csv_file_pattern': 'financial_data_{timestamp}.csv',
+            'output_json_file_pattern': 'report_data_{timestamp}.json',
+            'output_bibtex_file_pattern': 'references_{timestamp}.bib',
+            'output_pdf_file_pattern': 'partnership_report_{timestamp}.pdf',
+            'output_txt_file_pattern': 'intermediary_{timestamp}.txt',
+            'csv_delimiter': ',',
+            'json_indent': 2,
+            'bibtex_style': 'plain',
+            'carbone_template_id': '',
+            'carbone_api_version': 'v3',
+            'carbone_render_timeout': 60,
+            'txt_section_separator': '\n\n---\n\n',
+            'txt_include_timestamps': True
         }
         with pytest.raises(ValueError, match="deep_research_model_search must be a non-empty string"):
             validate_config(config)
@@ -92,7 +144,20 @@ class TestValidateConfig:
             'deep_research_model_questions': 'gemini-2.5-flash',
             'deep_research_iteration_timeout': 0,
             'deep_research_cache_ttl_days': 7,
-            'deep_research_gap_threshold': 3
+            'deep_research_gap_threshold': 3,
+            'output_csv_file_pattern': 'financial_data_{timestamp}.csv',
+            'output_json_file_pattern': 'report_data_{timestamp}.json',
+            'output_bibtex_file_pattern': 'references_{timestamp}.bib',
+            'output_pdf_file_pattern': 'partnership_report_{timestamp}.pdf',
+            'output_txt_file_pattern': 'intermediary_{timestamp}.txt',
+            'csv_delimiter': ',',
+            'json_indent': 2,
+            'bibtex_style': 'plain',
+            'carbone_template_id': '',
+            'carbone_api_version': 'v3',
+            'carbone_render_timeout': 60,
+            'txt_section_separator': '\n\n---\n\n',
+            'txt_include_timestamps': True
         }
         with pytest.raises(ValueError, match="deep_research_iteration_timeout must be an integer >= 1"):
             validate_config(config)
@@ -109,7 +174,20 @@ class TestValidateConfig:
             'deep_research_model_questions': 'gemini-2.5-flash',
             'deep_research_iteration_timeout': 300,
             'deep_research_cache_ttl_days': -1,
-            'deep_research_gap_threshold': 3
+            'deep_research_gap_threshold': 3,
+            'output_csv_file_pattern': 'financial_data_{timestamp}.csv',
+            'output_json_file_pattern': 'report_data_{timestamp}.json',
+            'output_bibtex_file_pattern': 'references_{timestamp}.bib',
+            'output_pdf_file_pattern': 'partnership_report_{timestamp}.pdf',
+            'output_txt_file_pattern': 'intermediary_{timestamp}.txt',
+            'csv_delimiter': ',',
+            'json_indent': 2,
+            'bibtex_style': 'plain',
+            'carbone_template_id': '',
+            'carbone_api_version': 'v3',
+            'carbone_render_timeout': 60,
+            'txt_section_separator': '\n\n---\n\n',
+            'txt_include_timestamps': True
         }
         with pytest.raises(ValueError, match="deep_research_cache_ttl_days must be an integer >= 1"):
             validate_config(config)
@@ -126,7 +204,20 @@ class TestValidateConfig:
             'deep_research_model_questions': 'gemini-2.5-flash',
             'deep_research_iteration_timeout': 300,
             'deep_research_cache_ttl_days': 7,
-            'deep_research_gap_threshold': 'not_an_int'
+            'deep_research_gap_threshold': 'not_an_int',
+            'output_csv_file_pattern': 'financial_data_{timestamp}.csv',
+            'output_json_file_pattern': 'report_data_{timestamp}.json',
+            'output_bibtex_file_pattern': 'references_{timestamp}.bib',
+            'output_pdf_file_pattern': 'partnership_report_{timestamp}.pdf',
+            'output_txt_file_pattern': 'intermediary_{timestamp}.txt',
+            'csv_delimiter': ',',
+            'json_indent': 2,
+            'bibtex_style': 'plain',
+            'carbone_template_id': '',
+            'carbone_api_version': 'v3',
+            'carbone_render_timeout': 60,
+            'txt_section_separator': '\n\n---\n\n',
+            'txt_include_timestamps': True
         }
         with pytest.raises(ValueError, match="deep_research_gap_threshold must be an integer >= 1"):
             validate_config(config)
