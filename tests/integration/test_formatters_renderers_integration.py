@@ -128,7 +128,7 @@ def mock_carbone_sdk():
     """Mock CarboneSDK class."""
     mock_sdk = Mock()
     mock_sdk.return_value = mock_sdk  # Constructor returns instance
-    mock_sdk.render.return_value = b'%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\nendobj\n%%EOF'
+    mock_sdk.render.return_value = (b'%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\nendobj\n%%EOF', 'unique_report_123')
     return mock_sdk
 
 
@@ -140,7 +140,7 @@ class TestFormattersRenderersIntegration:
         # Mock config
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1',
             'report_language': 'en',
             'pdf_margin_top': 20,
@@ -209,7 +209,7 @@ class TestFormattersRenderersIntegration:
         """Test complete workflow: normalized data -> Carbone JSON -> PDF rendering."""
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1',
             'report_language': 'en'
         }.get(key, default))
@@ -234,7 +234,7 @@ class TestFormattersRenderersIntegration:
         """Test error handling when formatters-renderers integration fails."""
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1'
         }.get(key, default))
 

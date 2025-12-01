@@ -148,7 +148,7 @@ def mock_carbone_sdk():
     """Mock CarboneSDK class."""
     mock_sdk = Mock()
     mock_sdk.return_value = mock_sdk  # Constructor returns instance
-    mock_sdk.render.return_value = b'%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\nendobj\n%%EOF'
+    mock_sdk.render.return_value = (b'%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\nendobj\n%%EOF', 'unique_report_123')
     return mock_sdk
 
 
@@ -160,7 +160,7 @@ class TestRenderersEndToEnd:
         # Mock config to use temp directory
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1',
             'report_language': 'en',
             'pdf_margin_top': 20,
@@ -241,7 +241,7 @@ class TestRenderersEndToEnd:
         """Test error handling and recovery in the rendering pipeline."""
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1',
             'carbone_max_retries': 2,
             'carbone_retry_base_delay': 0.1,
@@ -270,7 +270,7 @@ class TestRenderersEndToEnd:
         """Test various error scenarios in the rendering pipeline."""
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1'
         }.get(key, default))
 
@@ -307,7 +307,7 @@ class TestRenderersEndToEnd:
         """Test that PDF files are created with correct paths and permissions."""
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1'
         }.get(key, default))
 
@@ -337,7 +337,7 @@ class TestRenderersEndToEnd:
         """Test performance with large payloads (marked as extensive)."""
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1',
             'carbone_max_retries': 1  # Reduce retries for performance test
         }.get(key, default))
@@ -424,7 +424,7 @@ class TestRenderersEndToEnd:
         """Test that all renderer components work together correctly."""
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1',
             'report_language': 'en',
             'supported_languages': ['en', 'id']
@@ -468,7 +468,7 @@ class TestRenderersEndToEnd:
         """Test graceful degradation when rendering fails."""
         config.get = Mock(side_effect=lambda key, default=None: {
             'output_dir': temp_output_dir,
-            'carbone_api_key': 'test_api_key_123',
+            'carbone_secret_access_token': 'test_api_key_123',
             'carbone_template_id': 'test_template_v1'
         }.get(key, default))
 
@@ -478,12 +478,12 @@ class TestRenderersEndToEnd:
         mock_client = Mock()
         call_count = 0
 
-        def render_side_effect(payload):
+        def render_side_effect(file_or_template_id, json_data, options):
             nonlocal call_count
             call_count += 1
             if call_count <= 3:  # Fail first 3 attempts (max retries)
                 raise RuntimeError("Network timeout")  # Retryable error
-            return b'%PDF-1.4\nfallback content\n%%EOF'
+            return (b'%PDF-1.4\nfallback content\n%%EOF', 'fallback_report_123')
 
         mock_client.render.side_effect = render_side_effect
         mock_carbone_sdk.return_value = mock_client
