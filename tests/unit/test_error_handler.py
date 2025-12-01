@@ -330,15 +330,10 @@ class TestErrorHandler:
         """Test both primary and fallback render fail."""
         handler = ErrorHandler(mock_config)
 
-        def failing_render(payload, output_path):
-            raise ConnectionError("Connection failed")
+        failing_render = Mock(side_effect=ValueError("Fallback also failed"))
 
         with patch.object(handler, 'execute_with_configured_retry') as mock_retry:
-            # Both calls fail
-            mock_retry.side_effect = [
-                ConnectionError("Connection failed"),
-                ValueError("Fallback also failed")
-            ]
+            mock_retry.side_effect = ConnectionError("Connection failed")
 
             result_success, error_msg, output_path = handler.attempt_render_with_fallback(
                 failing_render, sample_payload, "/output/path.pdf"
