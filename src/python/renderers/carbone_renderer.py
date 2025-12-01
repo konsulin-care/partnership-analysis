@@ -147,7 +147,9 @@ class CarboneRenderer:
         """
         try:
             # Ensure output directory exists
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            output_dir = os.path.dirname(output_path)
+            if output_dir:
+                os.makedirs(output_dir, exist_ok=True)
 
             with open(output_path, 'wb') as f:
                 f.write(pdf_binary)
