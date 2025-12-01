@@ -14,7 +14,8 @@ def mock_config():
     """Mock ConfigLoader instance."""
     config = Mock()
     config.get.side_effect = lambda key, default=None: {
-        'carbone_api_key': 'test_api_key_123',
+        'carbone_secret_access_token': 'test_secret_token_123',
+        'carbone_api_version': 'v3',
         'carbone_template_id': 'test_template_v1',
         'report_language': 'en',
         'pdf_margin_top': 20,
@@ -30,7 +31,8 @@ def mock_carbone_sdk():
     """Mock CarboneSDK class."""
     mock_sdk = Mock()
     mock_sdk.return_value = mock_sdk  # Constructor returns instance
-    mock_sdk.render.return_value = b'%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\nendobj\n%%EOF'
+    mock_sdk.render.return_value = (b'%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\nendobj\n%%EOF', 'unique_report_123')
+    mock_sdk.set_api_version = Mock()
     return mock_sdk
 
 
@@ -73,7 +75,8 @@ class TestCarboneRenderer:
         assert client == mock_client
         assert renderer.client == mock_client
         assert renderer._initialized
-        mock_sdk_class.assert_called_once_with(api_key='test_api_key_123', api_version='v3')
+        mock_sdk_class.assert_called_once_with(secret_access_token='test_secret_token_123')
+        mock_client.set_api_version.assert_called_once_with('v3')
 
     @patch('src.python.renderers.carbone_renderer.CarboneSDK', None)
     def test_initialize_carbone_client_no_sdk(self, mock_config):
@@ -84,41 +87,32 @@ class TestCarboneRenderer:
             renderer.initialize_carbone_client()
 
     @patch('src.python.renderers.carbone_renderer.CarboneSDK')
-    def test_initialize_carbone_client_no_api_key(self, mock_sdk_class, mock_config):
-        """Test initialization fails when API key not in config."""
-        # Override the side_effect to return None for carbone_api_key
+    def test_initialize_carbone_client_no_secret_token(self, mock_sdk_class, mock_config):
+        """Test initialization fails when secret access token not in config."""
+        # Override the side_effect to return None for carbone_secret_access_token
         def side_effect(key, default=None):
-            if key == 'carbone_api_key':
+            if key == 'carbone_secret_access_token':
                 return None
             return default
         mock_config.get.side_effect = side_effect
 
         renderer = CarboneRenderer(mock_config)
 
-        with pytest.raises(ValueError, match="Carbone API key not found in configuration"):
+        with pytest.raises(ValueError, match="Carbone secret access token not found in configuration"):
             renderer.initialize_carbone_client()
 
     @patch('src.python.renderers.carbone_renderer.CarboneSDK')
-    def test_initialize_carbone_client_custom_api_key(self, mock_sdk_class, mock_config):
-        """Test initialization with custom API key."""
+    def test_initialize_carbone_client_custom_secret_token(self, mock_sdk_class, mock_config):
+        """Test initialization with custom secret access token."""
         mock_client = Mock()
         mock_sdk_class.return_value = mock_client
 
         renderer = CarboneRenderer(mock_config)
-        client = renderer.initialize_carbone_client(api_key='custom_key')
+        client = renderer.initialize_carbone_client(secret_access_token='custom_token')
 
-        mock_sdk_class.assert_called_once_with(api_key='custom_key', api_version='v3')
+        mock_sdk_class.assert_called_once_with(secret_access_token='custom_token')
+        mock_client.set_api_version.assert_called_once_with('v3')
 
-    @patch('src.python.renderers.carbone_renderer.CarboneSDK')
-    def test_initialize_carbone_client_custom_version(self, mock_sdk_class, mock_config):
-        """Test initialization with custom API version."""
-        mock_client = Mock()
-        mock_sdk_class.return_value = mock_client
-
-        renderer = CarboneRenderer(mock_config)
-        client = renderer.initialize_carbone_client(api_version='v2')
-
-        mock_sdk_class.assert_called_once_with(api_key='test_api_key_123', api_version='v2')
 
     @patch('src.python.renderers.carbone_renderer.CarboneSDK')
     def test_initialize_carbone_client_exception(self, mock_sdk_class, mock_config):
@@ -156,7 +150,7 @@ class TestCarboneRenderer:
     def test_render_to_pdf_success(self, mock_sdk_class, mock_config, sample_payload):
         """Test successful PDF rendering."""
         mock_client = Mock()
-        mock_client.render.return_value = b'fake_pdf_data'
+        mock_client.render.return_value = (b'fake_pdf_data', 'unique_report_123')
         mock_sdk_class.return_value = mock_client
 
         renderer = CarboneRenderer(mock_config)
@@ -166,7 +160,7 @@ class TestCarboneRenderer:
         result = renderer.render_to_pdf(sample_payload)
 
         assert result == b'fake_pdf_data'
-        mock_client.render.assert_called_once_with(sample_payload)
+        mock_client.render.assert_called_once_with('test_template_v1', sample_payload['data'], sample_payload['options'])
 
     def test_render_to_pdf_not_initialized(self, mock_config, sample_payload):
         """Test rendering fails when client not initialized."""
@@ -179,13 +173,13 @@ class TestCarboneRenderer:
     def test_render_to_pdf_with_client_param(self, mock_sdk_class, mock_config, sample_payload):
         """Test rendering with client parameter."""
         mock_client = Mock()
-        mock_client.render.return_value = b'pdf_data'
+        mock_client.render.return_value = (b'pdf_data', 'unique_report_456')
 
         renderer = CarboneRenderer(mock_config)
         result = renderer.render_to_pdf(sample_payload, client=mock_client)
 
         assert result == b'pdf_data'
-        mock_client.render.assert_called_once_with(sample_payload)
+        mock_client.render.assert_called_once_with('test_template_v1', sample_payload['data'], sample_payload['options'])
 
     @patch('src.python.renderers.carbone_renderer.CarboneSDK')
     def test_render_to_pdf_exception(self, mock_sdk_class, mock_config, sample_payload):
@@ -296,7 +290,7 @@ class TestCarboneRenderer:
     def test_render_and_save_success(self, mock_sdk_class, mock_config):
         """Test successful render and save operation."""
         mock_client = Mock()
-        mock_client.render.return_value = b'%PDF-1.4\nfake content\n%%EOF'
+        mock_client.render.return_value = (b'%PDF-1.4\nfake content\n%%EOF', 'unique_report_789')
         mock_sdk_class.return_value = mock_client
 
         renderer = CarboneRenderer(mock_config)
@@ -315,7 +309,7 @@ class TestCarboneRenderer:
     def test_render_and_save_validation_warning(self, mock_sdk_class, mock_config):
         """Test render and save with PDF validation warning."""
         mock_client = Mock()
-        mock_client.render.return_value = b'invalid pdf content'
+        mock_client.render.return_value = (b'invalid pdf content', 'unique_report_999')
         mock_sdk_class.return_value = mock_client
 
         renderer = CarboneRenderer(mock_config)

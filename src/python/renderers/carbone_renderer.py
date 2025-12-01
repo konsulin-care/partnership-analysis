@@ -38,13 +38,12 @@ class CarboneRenderer:
         self.client: Optional[CarboneSDK] = None
         self._initialized = False
 
-    def initialize_carbone_client(self, api_key: Optional[str] = None, api_version: str = "v3") -> CarboneSDK:
+    def initialize_carbone_client(self, secret_access_token: Optional[str] = None) -> CarboneSDK:
         """
         Initialize and return Carbone SDK client.
 
         Args:
-            api_key: Carbone API key (if None, uses config)
-            api_version: API version to use
+            secret_access_token: Carbone secret access token (if None, uses config)
 
         Returns:
             Initialized CarboneSDK client
@@ -55,13 +54,15 @@ class CarboneRenderer:
         if CarboneSDK is None:
             raise RuntimeError("Carbone SDK is not installed. Install with: pip install carbone-sdk")
 
-        if api_key is None:
-            api_key = self.config.get('carbone_api_key')
-            if not api_key:
-                raise ValueError("Carbone API key not found in configuration")
+        if secret_access_token is None:
+            secret_access_token = self.config.get('carbone_secret_access_token')
+            if not secret_access_token:
+                raise ValueError("Carbone secret access token not found in configuration")
 
         try:
-            self.client = CarboneSDK(api_key=api_key, api_version=api_version)
+            self.client = CarboneSDK(secret_access_token=secret_access_token)
+            api_version = self.config.get('carbone_api_version', 'v3')
+            self.client.set_api_version(api_version)
             self._initialized = True
             logger.info("Carbone client initialized successfully", api_version=api_version)
             return self.client
@@ -124,9 +125,12 @@ class CarboneRenderer:
 
         try:
             logger.info("Starting PDF rendering with Carbone")
-            pdf_binary = client.render(payload)
-            logger.info("PDF rendering completed successfully")
-            return pdf_binary
+            file_or_template_id = payload.get("template")
+            json_data = payload.get("data")
+            options = payload.get("options", {})
+            report_bytes, unique_report_name = client.render(file_or_template_id, json_data, options)
+            logger.info("PDF rendering completed successfully", report_name=unique_report_name)
+            return report_bytes
         except Exception as e:
             logger.error("PDF rendering failed", error=str(e))
             raise RuntimeError(f"Carbone rendering failed: {e}") from e
