@@ -88,7 +88,15 @@ class ErrorHandler:
         def retry_wrapper():
             return func(*args, **kwargs)
 
-        return self.execute_with_retry(retry_wrapper)
+        try:
+            logger.debug("Executing function with configured retry", func_name=func.__name__)
+            result = retry_wrapper()
+            logger.debug("Function executed successfully", func_name=func.__name__)
+            return result
+        except Exception as e:
+            logger.warning("Function execution failed after retries",
+                         func_name=func.__name__, error=str(e))
+            raise
 
     def graceful_degradation(self, func: Callable, default_value: Any = None, *args, **kwargs) -> Any:
         """
