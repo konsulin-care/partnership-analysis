@@ -245,7 +245,7 @@ class PayloadValidator:
 
         return len(errors) == 0, errors
 
-    def validate_and_suggest_fixes(self, payload: Dict[str, Any]) -> Tuple[bool, List[str], Dict[str, Any]]:
+    def validate_and_suggest_fixes(self, payload: Dict[str, Any]) -> Tuple[bool, List[str], List[str], Dict[str, Any]]:
         """
         Validate payload and suggest fixes for common issues.
 
@@ -253,21 +253,26 @@ class PayloadValidator:
             payload: Payload to validate and potentially fix
 
         Returns:
-            Tuple of (is_valid, errors, suggested_payload)
+            Tuple of (is_valid, errors, fixes, suggested_payload)
+            - is_valid: True if payload passes validation without fixes
+            - errors: List of validation error messages
+            - fixes: List of automatic fix messages applied
+            - suggested_payload: Payload with fixes applied
         """
         is_valid, errors = self.validate_payload(payload)
 
         # Create a copy for suggestions
         suggested = payload.copy() if isinstance(payload, dict) else {}
+        fixes = []
 
         # Apply common fixes
         if 'data' not in suggested:
             suggested['data'] = {}
-            errors.append("Added missing 'data' section")
+            fixes.append("Added missing 'data' section")
 
         if 'template' not in suggested:
             suggested['template'] = self.config.get('carbone_template_id', 'partnership_report_v1')
-            errors.append("Added default template")
+            fixes.append("Added default template")
 
         if 'options' not in suggested:
             suggested['options'] = {
@@ -280,6 +285,6 @@ class PayloadValidator:
                     'right': self.config.get('pdf_margin_right', 15)
                 }
             }
-            errors.append("Added default options")
+            fixes.append("Added default options")
 
-        return is_valid, errors, suggested
+        return is_valid, errors, fixes, suggested

@@ -121,14 +121,13 @@ class ErrorHandler:
                          func_name=func.__name__, error=str(e), default=default_value)
             return default_value
 
-    def handle_carbone_error(self, error: Exception, operation: str, payload: Optional[Dict[str, Any]] = None) -> Tuple[bool, str]:
+    def handle_carbone_error(self, error: Exception, operation: str) -> Tuple[bool, str]:
         """
         Handle Carbone-specific errors and determine recovery strategy.
 
         Args:
             error: The exception that occurred
             operation: Description of the operation being performed
-            payload: Optional payload data for context
 
         Returns:
             Tuple of (should_retry, error_message)
@@ -192,7 +191,7 @@ class ErrorHandler:
             result = self.execute_with_configured_retry(render_func, payload, output_path, *args, **kwargs)
             return True, "", result
         except Exception as e:
-            should_retry, error_msg = self.handle_carbone_error(e, "PDF rendering", payload)
+            should_retry, error_msg = self.handle_carbone_error(e, "PDF rendering")
 
             if not should_retry:
                 # Non-retryable error
@@ -206,7 +205,7 @@ class ErrorHandler:
                 logger.warning("Fallback rendering succeeded with simplified payload")
                 return True, "Rendered with simplified payload", result
             except Exception as fallback_error:
-                _, fallback_msg = self.handle_carbone_error(fallback_error, "fallback rendering", simplified_payload)
+                _, fallback_msg = self.handle_carbone_error(fallback_error, "fallback rendering")
                 return False, f"{error_msg}; Fallback also failed: {fallback_msg}", None
 
     def _create_fallback_payload(self, original_payload: Dict[str, Any]) -> Dict[str, Any]:

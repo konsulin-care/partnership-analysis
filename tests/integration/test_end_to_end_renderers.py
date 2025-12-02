@@ -230,12 +230,12 @@ class TestRenderersEndToEnd:
         assert any('document' in error for error in errors)
 
         # Test validation with suggestions
-        is_valid, errors, suggested = validator.validate_and_suggest_fixes(invalid_payload)
+        is_valid, errors, fixes, suggested = validator.validate_and_suggest_fixes(invalid_payload)
         assert not is_valid
         # The validator doesn't automatically add missing data sections, just top-level structure
-        assert 'data' in suggested
-        assert 'template' in suggested
-        assert 'options' in suggested
+        # Since data/template/options are present, no fixes are applied
+        assert len(fixes) == 0
+        assert suggested == invalid_payload  # No changes made
 
     def test_error_handling_integration(self, sample_normalized_data, config, temp_output_dir, mock_carbone_sdk):
         """Test error handling and recovery in the rendering pipeline."""

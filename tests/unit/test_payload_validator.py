@@ -309,10 +309,11 @@ class TestPayloadValidator:
         """Test validate and suggest fixes for valid payload."""
         validator = PayloadValidator(mock_config)
 
-        is_valid, errors, suggested = validator.validate_and_suggest_fixes(valid_payload)
+        is_valid, errors, fixes, suggested = validator.validate_and_suggest_fixes(valid_payload)
 
         assert is_valid
         assert errors == []
+        assert fixes == []
         assert suggested == valid_payload
 
     def test_validate_and_suggest_fixes_missing_sections(self, mock_config):
@@ -320,9 +321,13 @@ class TestPayloadValidator:
         validator = PayloadValidator(mock_config)
         incomplete_payload = {}  # No template, data, or options
 
-        is_valid, errors, suggested = validator.validate_and_suggest_fixes(incomplete_payload)
+        is_valid, errors, fixes, suggested = validator.validate_and_suggest_fixes(incomplete_payload)
 
         assert not is_valid
+        assert len(fixes) == 3
+        assert "Added missing 'data' section" in fixes
+        assert "Added default template" in fixes
+        assert "Added default options" in fixes
         assert 'data' in suggested
         assert 'template' in suggested
         assert 'options' in suggested
@@ -334,9 +339,13 @@ class TestPayloadValidator:
         """Test validate and suggest fixes handles invalid input."""
         validator = PayloadValidator(mock_config)
 
-        is_valid, errors, suggested = validator.validate_and_suggest_fixes("not a dict")
+        is_valid, errors, fixes, suggested = validator.validate_and_suggest_fixes("not a dict")
 
         assert not is_valid
+        assert len(fixes) == 3
+        assert "Added missing 'data' section" in fixes
+        assert "Added default template" in fixes
+        assert "Added default options" in fixes
         assert isinstance(suggested, dict)
         assert 'data' in suggested
         assert 'template' in suggested
