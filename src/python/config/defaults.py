@@ -52,6 +52,15 @@ DEFAULTS = {
     'carbone_template_id': '',
     'carbone_api_version': 'v3',
     'carbone_render_timeout': 60,
+    'carbone_max_retries': 3,
+    'carbone_retry_base_delay': 1.0,
+    'carbone_retry_max_delay': 10.0,
+    'report_language': 'en',
+    'supported_languages': ['en', 'id'],
+    'pdf_margin_top': 20,
+    'pdf_margin_bottom': 20,
+    'pdf_margin_left': 15,
+    'pdf_margin_right': 15,
     # TXT intermediary formatting preferences
     'txt_section_separator': '\n\n---\n\n',
     'txt_include_timestamps': True
