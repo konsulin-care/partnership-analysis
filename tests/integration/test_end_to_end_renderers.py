@@ -7,6 +7,7 @@ through PDF rendering, including error scenarios, large payloads, and performanc
 
 import json
 import os
+import re
 import tempfile
 import time
 import pytest
@@ -24,6 +25,27 @@ from src.python.renderers import CarboneRenderer, PayloadValidator, ErrorHandler
 @pytest.fixture
 def sample_normalized_data():
     """Load and return comprehensive normalized data for testing."""
+
+    def robust_int_parse(value_str, field_name):
+        if not isinstance(value_str, str):
+            raise ValueError(f"{field_name}: Expected string, got {type(value_str)}")
+        value_str = value_str.strip()
+        if not value_str:
+            raise ValueError(f"{field_name}: Empty string")
+        # Remove thousands separators (assuming '.')
+        value_str = value_str.replace('.', '')
+        # Check for decimal separator
+        if ',' in value_str:
+            raise ValueError(f"{field_name}: Decimal values not allowed for integer field")
+        # Strip non-numeric characters
+        value_str = re.sub(r'[^0-9]', '', value_str)
+        if not value_str:
+            raise ValueError(f"{field_name}: No numeric characters found")
+        try:
+            return int(value_str)
+        except ValueError as e:
+            raise ValueError(f"{field_name}: Failed to parse as integer: {e}")
+
     fixture_path = Path(__file__).parent.parent / "fixtures" / "sample_normalization_data.json"
     with open(fixture_path, 'r') as f:
         raw_data = json.load(f)
@@ -63,7 +85,7 @@ def sample_normalized_data():
         'partnership_terms': {
             'revenue_share_pct': float(raw_data['raw_partnership_terms']['share_percentage']),
             'capex_investment_idr': int(raw_data['raw_partnership_terms']['capex']),
-            'capex_hub_contribution_idr': int(raw_data['raw_partnership_terms']['hub_capex'].replace('.', '')),
+            'capex_hub_contribution_idr': robust_int_parse(raw_data['raw_partnership_terms']['hub_capex'], 'capex_hub_contribution_idr'),
             'space_sqm': float(raw_data['raw_partnership_terms']['area']),
             'commitment_years': int(raw_data['raw_partnership_terms']['years']),
             'launch_timeline_days': int(raw_data['raw_partnership_terms']['timeline'])
