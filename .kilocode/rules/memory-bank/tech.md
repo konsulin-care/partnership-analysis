@@ -10,6 +10,7 @@
 # Development Setup
 
 - Project structured under `src/python` with separate packages for research, extraction, calculations, schema, formatters, renderers, orchestration, and config
+- Orchestration layer provides complete 11-step pipeline coordination with error recovery and state management
 - Environment defined via `environment.yml` and `.env` files, loaded by a dedicated `ConfigLoader` module
 - Local JSON files used for research caching, configuration defaults, and schema definitions
 - Tests organized into `tests/unit` and `tests/integration` with fixtures under `tests/fixtures`
@@ -37,4 +38,5 @@
 - Output formatter converts normalized data and metrics into CSV, JSON, BibTeX, and Carbone JSON payloads for rendering
 - Carbone renderer wrapper initializes the SDK client, sends JSON payloads, and writes PDF binaries to the `outputs` directory
 - Error handler applies exponential backoff retries for web search and Carbone calls, with graceful degradation and default fallbacks on failure
+- Workflow coordinator orchestrates the complete 11-step pipeline with stage execution, error recovery, and state management
 - Performance benchmarks use extensive testing markers to skip time-consuming tests by default
