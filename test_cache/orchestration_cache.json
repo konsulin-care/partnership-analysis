@@ -1,0 +1,44 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-12-07T12:04:20.394533",
+  "execution_cache": {
+    "66cca3436da0f2ddf47f24e60cb5c11c6e5ce6b252a2dcf669ca6e9b3ecf96fd": {
+      "execution_id": "test_execution_123",
+      "result": {
+        "output": "test_result"
+      },
+      "cached_at": "2025-12-07T12:04:16.321284",
+      "expires_at": "2025-12-08T12:04:16.321296",
+      "ttl_seconds": 86400
+    }
+  },
+  "research_cache": {
+    "631625716613e0035596d09f052faf7cdd81264143f1284019980703e5fd8ed6": {
+      "query": "medical aesthetics pricing 2025",
+      "result": {
+        "pricing": {
+          "min": 15000000,
+          "max": 45000000
+        }
+      },
+      "cached_at": "2025-12-07T12:04:16.329268",
+      "expires_at": "2026-01-06T12:04:16.329274",
+      "ttl_seconds": 2592000
+    }
+  },
+  "calculation_cache": {
+    "8c6609e680a13713ea2328d70e09549cb73e43a9025daaae71b97a8a3857b07c": {
+      "calculation_type": "breakeven_analysis",
+      "params": {
+        "capex": 1000000,
+        "monthly_profit": 50000
+      },
+      "result": {
+        "breakeven_months": 20
+      },
+      "cached_at": "2025-12-07T12:04:16.335427",
+      "expires_at": "2025-12-08T12:04:16.335438",
+      "ttl_seconds": 86400
+    }
+  }
+}

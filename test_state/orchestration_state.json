@@ -1,0 +1,54 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-12-07T12:04:18.390836",
+  "execution_history": [
+    {
+      "execution_id": "de9794040b1abd8d03798adfc2f1429625246fca2b2979ee901950ecf4675e70",
+      "workflow_name": "workflow_2",
+      "start_time": "2025-12-07T12:04:18.356856",
+      "status": "started",
+      "context": {
+        "param": 2
+      },
+      "stages": []
+    },
+    {
+      "execution_id": "d76c487a0dd3e8413f136f811f6aebe6d51b586093e6b725dae72148294b0cb9",
+      "workflow_name": "workflow_3",
+      "start_time": "2025-12-07T12:04:18.358540",
+      "status": "started",
+      "context": {
+        "param": 3
+      },
+      "stages": []
+    },
+    {
+      "execution_id": "afa29683debac34c18d6dea13fe5bbd7c217e599b245cf841a33002c1c921d17",
+      "workflow_name": "workflow_4",
+      "start_time": "2025-12-07T12:04:18.359888",
+      "status": "started",
+      "context": {
+        "param": 4
+      },
+      "stages": []
+    },
+    {
+      "execution_id": "3ffbade548f2f053a2cb191df07fa35f68cb696cdc701f5c12df6f8373d65659",
+      "workflow_name": "workflow1",
+      "start_time": "2025-12-07T12:04:18.390231",
+      "status": "started",
+      "context": {},
+      "stages": []
+    },
+    {
+      "execution_id": "bdf0f9780bfcd96afe8cae6a565c0f3db80d8994131faccd6a0828d9901f8bca",
+      "workflow_name": "workflow2",
+      "start_time": "2025-12-07T12:04:18.390829",
+      "status": "started",
+      "context": {},
+      "stages": []
+    }
+  ],
+  "current_execution": "bdf0f9780bfcd96afe8cae6a565c0f3db80d8994131faccd6a0828d9901f8bca",
+  "workflow_status": {}
+}
